@@ -44,6 +44,9 @@ Laravel環境構築
   phpMyAdmin:：<http://localhost:8080/>
   MailHog：<http://localhost:8025/>
   stripe:<https://dashboard.stripe.com/acct_1SN3miFbW3HpXmAy/test/dashboard>
+        ログインメールアドレス:kiyotaka.moriya@gmail.com
+        ログインパスワード:coachtechtest
+
          Stripe の API キーは以下のように設定をお願いいたします。
 
         STRIPE_PUBLIC_KEY="pk_test_51SN3miFbW3HpXmAy7HDBoEn13MbwMAbBEkVRYSPEpzuNUkrXRg04LiGLx2KLqurJ8D5GaGFoNNeQ7tVGAtBR4fwg00ScZbVJdi"
@@ -57,6 +60,5 @@ Laravel環境構築
           郵便番号：12345
 ・ER図
 ![](2025-10-28-18-12-32.png)
-
 ・テーブル設計
 ![](2025-10-28-18-13-59.png)
