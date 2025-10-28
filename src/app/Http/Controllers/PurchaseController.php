@@ -6,30 +6,117 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
 use App\Models\User;
+use App\Models\SoldItem;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+use App\Models\Payment;
 
 class PurchaseController extends Controller
 {
-  // 購入画面
   public function index($item_id, Request $request)
   {
     $item = Item::find($item_id);
-
-    // Authインスタンスをリフレッシュして最新情報を取得
     Auth::user()->refresh();
     $user = Auth::user();
-
     return view('purchase', compact('item', 'user'));
   }
 
-  // 購入処理（Stripeなし）
-  public function purchase($item_id, Request $request)
+  public function purchase(Request $request, $item_id)
+  {
+    $item = Item::findOrFail($item_id);
+    $user = auth()->user();
+
+    $paymentMethod = $request->input('payment_method');
+
+    if ($paymentMethod === 'card') {
+      Stripe::setApiKey(config('stripe.secret_key'));
+
+      try {
+        $paymentIntent = PaymentIntent::create([
+          'amount' => $item->price,
+          'currency' => 'jpy',
+          'automatic_payment_methods' => [
+            'enabled' => true,
+          ],
+          'metadata' => [
+            'item_id' => $item->id,
+            'user_id' => $user->id,
+          ],
+        ]);
+
+        session([
+          'payment_intent_id' => $paymentIntent->id,
+          'item_id' => $item_id,
+        ]);
+
+        return view('purchase.stripe', [
+          'item' => $item,
+          'clientSecret' => $paymentIntent->client_secret,
+        ]);
+      } catch (\Exception $e) {
+        return back()->with('error', '決済の準備に失敗しました: ' . $e->getMessage());
+      }
+    } else {
+      return redirect()->route('purchase.index', ['item_id' => $item_id])
+        ->with('success', '購入処理を完了しました（仮）');
+    }
+  }
+
+  public function address($item_id)
   {
     $item = Item::find($item_id);
+    $user = Auth::user();
+    return view('address', compact('item', 'user'));
+  }
 
-    // ここに実際の購入処理を書く
-    // 例: 購入履歴をデータベースに保存など
+  public function updateAddress(Request $request, $item_id)
+  {
+    $user = Auth::user();
+    $user->postal_code = $request->postal_code;
+    $user->address = $request->address;
+    $user->building = $request->building;
+    $user->save();
+    return redirect("/purchase/{$item_id}");
+  }
 
-    return redirect()->route('purchase.index', ['item_id' => $item_id])
-      ->with('success', '購入処理を完了しました（仮）');
+  public function success(Request $request, $item_id)
+  {
+    $paymentIntentId = $request->query('payment_intent');
+    $item = Item::find($item_id);
+    $user = auth()->user();
+
+    if ($paymentIntentId) {
+      Stripe::setApiKey(config('stripe.secret_key'));
+
+      try {
+        $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+
+        // 決済情報を保存
+        Payment::create([
+          'user_id' => $user->id,
+          'stripe_payment_id' => $paymentIntent->id,
+          'amount' => $paymentIntent->amount,
+          'currency' => $paymentIntent->currency,
+          'status' => $paymentIntent->status,
+          'description' => '商品購入: ' . $item->name,
+        ]);
+
+        // 購入履歴を保存（sold_itemsテーブル）
+        SoldItem::create([
+          'item_id' => $item->id,
+          'user_id' => $user->id,
+          'sending_postcode' => $user->postal_code,
+          'sending_address' => $user->address,
+          'sending_building' => $user->building,
+        ]);
+
+        return view('purchase.success', compact('item', 'paymentIntent'));
+      } catch (\Exception $e) {
+        return redirect()->route('purchase.index', $item_id)
+          ->with('error', '決済の確認に失敗しました: ' . $e->getMessage());
+      }
+    }
+
+    return view('purchase.success', compact('item'));
   }
 }

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', [ItemController::class, 'index'])->name('items.list');
 Route::get('/item/{item}', [ItemController::class, 'detail'])->name('item.detail');
@@ -57,3 +58,8 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     session()->forget('unauthenticated_user');
     return redirect('/mypage/profile')->with('success', 'メール認証が完了しました。プロフィールを設定してください。');
 })->name('verification.verify');
+
+Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
+Route::post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+Route::post('/webhook/stripe', [PaymentController::class, 'webhook'])->name('payment.webhook');

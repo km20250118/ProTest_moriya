@@ -15,15 +15,12 @@ class UserController extends Controller
 {
   public function profile()
   {
-
     $profile = Profile::where('user_id', Auth::id())->first();
-
     return view('profile', compact('profile'));
   }
 
   public function updateProfile(ProfileRequest $request)
   {
-
     $img = $request->file('img_url');
     if (isset($img)) {
       $img_url = Storage::disk('local')->put('public/img', $img);
@@ -60,6 +57,7 @@ class UserController extends Controller
   public function mypage(Request $request)
   {
     $user = User::find(Auth::id());
+
     if ($request->page == 'buy') {
       $items = SoldItem::where('user_id', $user->id)->get()->map(function ($sold_item) {
         return $sold_item->item;
@@ -67,6 +65,7 @@ class UserController extends Controller
     } else {
       $items = Item::where('user_id', $user->id)->get();
     }
+
     return view('mypage', compact('user', 'items'));
   }
 }
