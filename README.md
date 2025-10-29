@@ -1,6 +1,8 @@
 # mogitest_01
 模擬案件1回目
 
+・タイトル：実践学習ターム 模擬案件初級_フリマアプリ
+
 ・環境構築
  git clone <git@github.com>:km20250118/mogitest_01.git
  DockerDesktopアプリを立ち上げる
