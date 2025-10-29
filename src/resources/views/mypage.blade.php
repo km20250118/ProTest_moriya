@@ -31,8 +31,18 @@
     </div>
     <div class="border">
         <ul class="border__list">
-            <li><a href="/mypage?page=sell">出品した商品</a></li>
-            <li><a href="/mypage?page=buy">購入した商品</a></li>
+            <li>
+                <a href="/mypage?page=sell" 
+                   class="{{ request('page', 'sell') === 'sell' ? 'active' : '' }}">
+                    出品した商品
+                </a>
+            </li>
+            <li>
+                <a href="/mypage?page=buy" 
+                   class="{{ request('page') === 'buy' ? 'active' : '' }}">
+                    購入した商品
+                </a>
+            </li>
         </ul>
     </div>
     <div class="items">

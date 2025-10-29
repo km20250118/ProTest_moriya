@@ -2,7 +2,6 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-
 }
 
 .user__info {
@@ -28,4 +27,32 @@
 
 .items {
   margin-top: 30px;
+}
+
+/* タブのリンクスタイル */
+.border__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.border__list li a {
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.border__list li a:hover {
+  color: #ff0000;
+}
+
+/* アクティブなタブ（背景色付き） */
+.border__list li a.active {
+  color: #fff !important;
+  background-color: #ff0000 !important;
+  border-radius: 5px !important;
+  padding: 10px 20px !important;
+  font-weight: bold !important;
 }

@@ -57,6 +57,9 @@
 .border__list {
   border-bottom: 1px solid #5F5F5F;
   display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .border__list li:first-child {
@@ -66,6 +69,29 @@
 .border__list li {
   padding: 20px 80px;
   font-weight: bold;
+}
+
+/* タブのリンクスタイル - 詳細度を上げる */
+.border__list li a {
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+  transition: all 0.3s;
+  padding: 0;
+  /* 既存のpaddingをリセット */
+}
+
+.border__list li a:hover {
+  color: #ff0000;
+}
+
+/* アクティブなタブ（背景色付き） - 詳細度を上げる */
+.border__list li a.active {
+  color: #fff !important;
+  background-color: #ff0000 !important;
+  border-radius: 5px !important;
+  padding: 10px 20px !important;
+  font-weight: bold !important;
 }
 
 @media (min-width: 768px) and (max-width: 850px) {
