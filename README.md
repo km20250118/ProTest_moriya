@@ -251,15 +251,36 @@ php artisan migrate:fresh --seed
 ### 最新テスト実行結果
 
 **実行日**: 2025年11月5日  
-**テスト数**: 15  
-**成功**: ✅ 15（全て合格）  
+**テスト数**: 56  
+**成功**: ✅ 56（全て合格）  
 **失敗**: ❌ 0  
 **成功率**: 100%  
-**実行時間**: 1.05秒  
-
+**実行時間**: 1.92秒  
+**テスト内訳**:
+- Unit Tests: 1
+- Feature Tests: 55
+  - 認証機能: 14テスト
+  - 商品機能: 36テスト
+  - 住所機能: 4テスト
+  - ユーザー機能: 6テスト
+  - 支払い機能: 2テスト
+  - その他: 2テスト
+  
 ````
    PASS  Tests\Unit\ExampleTest
   ✓ example
+
+   PASS  Tests\Feature\Address\AddressChangeTest
+  ✓ address edit page displays
+  ✓ user can update address via profile
+  ✓ purchase address change page displays
+  ✓ user can update address during purchase
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ user can register
+  ✓ email verification notice page displays
+  ✓ verification email is sent
+  ✓ user can verify email
 
    PASS  Tests\Feature\Auth\LoginTest
   ✓ login validation email required
@@ -281,6 +302,59 @@ php artisan migrate:fresh --seed
    PASS  Tests\Feature\ExampleTest
   ✓ example
 
+   PASS  Tests\Feature\Item\CommentTest
+  ✓ authenticated user can post comment
+  ✓ guest cannot post comment
+  ✓ comment validation content required
+  ✓ comment validation max length
+
+   PASS  Tests\Feature\Item\ItemCreateTest
+  ✓ sell page displays
+  ✓ user can create item with all information
+  ✓ item creation validates required fields
+  ✓ guest cannot access sell page
+
+   PASS  Tests\Feature\Item\ItemDetailTest
+  ✓ item detail page displays
+  ✓ item detail displays all information
+  ✓ item categories are displayed correctly
+
    PASS  Tests\Feature\Item\ItemIndexTest
   ✓ item index page displays
   ✓ all items are displayed
+  ✓ sold items display correctly
+
+   PASS  Tests\Feature\Item\ItemSearchTest
+  ✓ search by item name
+  ✓ search shows matching results
+
+   PASS  Tests\Feature\Item\LikeTest
+  ✓ user can like item
+  ✓ user can unlike item
+  ✓ guest cannot like item
+  ✓ like count increases and decreases
+
+   PASS  Tests\Feature\Item\MyListTest
+  ✓ liked items are displayed
+  ✓ sold liked items display correctly
+  ✓ mylist requires authentication
+
+   PASS  Tests\Feature\Item\PurchaseTest
+  ✓ purchase page displays
+  ✓ user can purchase item
+  ✓ purchase success page displays
+  ✓ address change page displays
+
+   PASS  Tests\Feature\Payment\PaymentMethodTest
+  ✓ payment method selection page loads
+  ✓ payment form displays
+
+   PASS  Tests\Feature\User\UserProfileTest
+  ✓ mypage displays
+  ✓ user profile displays all information
+  ✓ guest cannot access mypage
+
+   PASS  Tests\Feature\User\UserProfileUpdateTest
+  ✓ profile edit page displays
+  ✓ profile shows current user information
+  ✓ user can update profile

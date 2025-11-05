@@ -71,7 +71,7 @@
                     <div class="comment">
                         <div class="comment__user">
                             <div class="user__img">
-                                <img src="{{ \Storage::url($comment->user->profile->img_url) }}" alt="">
+                                <img src="{{ $comment->user->profile ? \Storage::url($comment->user->profile->img_url) : asset('img/default_user.png') }}" alt="">
                             </div>
                             <p class="user__name">{{$comment->user->name}}</p>
                         </div>

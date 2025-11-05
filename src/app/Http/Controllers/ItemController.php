@@ -53,12 +53,13 @@ class ItemController extends Controller
 
   public function search(Request $request)
   {
-    $search_word = $request->search_item;
+    $search = $request->input('keyword', '');
+    $tab = 'recommend';
     $query = Item::query();
-    $query = Item::scopeItem($query, $search_word);
+    $query = Item::scopeItem($query, $search);
 
     $items = $query->get();
-    return view('index', compact('items'));
+    return view('index', compact('items', 'search', 'tab'));
   }
 
   public function sellView()
@@ -70,10 +71,15 @@ class ItemController extends Controller
 
   public function sellCreate(ItemRequest $request)
   {
-    $img = $request->file('img_url');
-
-    $img_url = Storage::disk('local')->put('public/img', $img);
-
+    // imageまたはimg_urlのどちらでも対応
+    $img = $request->file('image') ?? $request->file('img_url');
+    
+    if ($img) {
+      $img_url = Storage::disk('local')->put('public/img', $img);
+    } else {
+      $img_url = null; // 画像がない場合
+    }
+    
     $item = Item::create([
       'name' => $request->name,
       'price' => $request->price,
@@ -83,14 +89,12 @@ class ItemController extends Controller
       'condition_id' => $request->condition_id,
       'user_id' => Auth::id(),
     ]);
-
     foreach ($request->categories as $category_id) {
       CategoryItem::create([
         'item_id' => $item->id,
         'category_id' => $category_id
       ]);
     }
-
     return redirect()->route('item.detail', ['item' => $item->id]);
-  }
+}
 }

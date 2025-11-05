@@ -84,3 +84,4 @@ class Item extends Model
     return $query->where('name', 'like', '%' . $item_name . '%');
   }
 }
+  

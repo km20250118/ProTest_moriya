@@ -66,7 +66,8 @@ class PurchaseController extends Controller
   {
     $item = Item::find($item_id);
     $user = Auth::user();
-    return view('address', compact('item', 'user'));
+    $address = $user->profile;
+    return view('address', compact('item', 'address', 'item_id'));
   }
 
   public function updateAddress(Request $request, $item_id)
