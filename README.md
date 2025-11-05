@@ -19,6 +19,7 @@
 - [ライセンス](#ライセンス)
 - [開発者](#開発者)
 - [ER図](#er図)
+- [PHPUnitテスト](#PHPUnitテスト結果)
 
 ---
 
@@ -237,3 +238,43 @@ php artisan migrate:fresh --seed
 ## ER図
 
  ![](2025-10-28-18-12-32.png)
+
+---
+
+## PHPUnitテスト結果
+
+### 最新テスト実行結果
+
+**実行日**: 2025年11月5日  
+**テスト数**: 15  
+**成功**: ✅ 15  
+**失敗**: ❌ 0  
+**実行時間**: 1.05秒
+
+````
+   PASS  Tests\Unit\ExampleTest
+  ✓ example
+
+   PASS  Tests\Feature\Auth\LoginTest
+  ✓ login validation email required
+  ✓ login validation password required
+  ✓ login fails with invalid credentials
+  ✓ login success with valid credentials
+
+   PASS  Tests\Feature\Auth\LogoutTest
+  ✓ user can logout
+
+   PASS  Tests\Feature\Auth\RegisterTest
+  ✓ register validation name required
+  ✓ register validation email required
+  ✓ register validation password required
+  ✓ register validation password must be string
+  ✓ register validation password confirmation mismatch
+  ✓ register success with valid data
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ example
+
+   PASS  Tests\Feature\Item\ItemIndexTest
+  ✓ item index page displays
+  ✓ all items are displayed
