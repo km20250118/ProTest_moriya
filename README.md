@@ -1,8 +1,8 @@
-# mogitest_01
+# ProTest_moriya
 
-## 模擬案件1回目
+## Pro入会テスト
 
-**タイトル**: 実践学習ターム 模擬案件初級_フリマアプリ
+**タイトル**:模擬案件フリマアプリの追加機能実装
 
 ---
 
@@ -28,7 +28,7 @@
 ### 1. リポジトリのクローン
 
 ```bash
-git clone git@github.com:km20250118/mogitest_01.git
+git clone git@github.com:km20250118/ProTest_moriya.git
 ```
 
 Dockerデスクトップアプリを立ち上げる
