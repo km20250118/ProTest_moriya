@@ -358,3 +358,4 @@ php artisan migrate:fresh --seed
   ✓ profile edit page displays
   ✓ profile shows current user information
   ✓ user can update profile
+# ProTest_moriya
