@@ -12,9 +12,8 @@
     <div class="address-change-container">
         <h2 class="address-change-title">住所の変更</h2>
 
-        <form action="{{ route('address.update') }}" method="POST">
-            @csrf
-            <input type="hidden" name="item_id" value="{{ $item_id }}">
+        <form action="/purchase/address/{{ $item_id }}" method="POST">
+          @csrf
 
             <div class="address-form-group">
                 <label>郵便番号</label>

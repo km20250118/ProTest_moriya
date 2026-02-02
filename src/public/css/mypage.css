@@ -77,3 +77,33 @@
 .user-rating .star.filled {
   color: #f39c12;
 }
+
+/* 取引中の商品タブ */
+.border__list li a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 未読がある場合：赤文字 */
+.border__list a.has-unread {
+  color: #e53935 !important;
+  font-weight: 600;
+}
+
+/* 未読バッジ：赤い円形 */
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  background: #e53935;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 50%;
+  line-height: 1;
+}

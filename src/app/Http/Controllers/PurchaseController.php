@@ -26,6 +26,12 @@ class PurchaseController extends Controller
     $item = Item::findOrFail($item_id);
     $user = auth()->user();
 
+    // 住所未設定の場合は住所入力画面へリダイレクト
+    if (!$user->postal_code || !$user->address) {
+      return redirect("/purchase/address/{$item_id}")
+        ->with('error', '配送先住所を設定してください');
+    }
+
     $paymentMethod = $request->input('payment_method');
 
     if ($paymentMethod === 'card') {

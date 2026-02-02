@@ -57,15 +57,11 @@
             </li>
             <li>
                 <a href="/mypage?page=transaction" 
-                   class="{{ $currentTab === 'transaction' ? 'active' : '' }}"
-                   style="position: relative;">
-                    取引中の商品
-                    @if ($transactionItems->sum('unread_count') > 0)
-                        <span class="badge bg-danger rounded-pill ms-1" 
-                              style="font-size: 11px; padding: 2px 7px;">
-                            {{ $transactionItems->sum('unread_count') }}
-                        </span>
-                    @endif
+                   class="{{ $currentTab === 'transaction' ? 'active' : '' }} {{ $transactionItems->sum('unread_count') > 0 ? 'has-unread' : '' }}">
+                   取引中の商品
+                   @if ($transactionItems->sum('unread_count') > 0)
+                       <span class="unread-badge">{{ $transactionItems->sum('unread_count') }}</span>
+                   @endif
                 </a>
             </li>
         </ul>

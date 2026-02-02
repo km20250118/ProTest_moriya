@@ -19,7 +19,7 @@
 - [ライセンス](#ライセンス)
 - [開発者](#開発者)
 - [ER図](#er図)
-- [PHPUnitテスト](#PHPUnitテスト)
+- [PHPUnitテスト](#phpunitテスト)
 
 ---
 
@@ -78,8 +78,11 @@ php artisan storage:link
 
 | 項目 | 内容 |
 |------|------|
-| **ID** | [test@example.com](mailto:test@example.com) |
-| **パスワード** | 12345678 |
+| **一般ユーザー1** | <general1@gmail.com> / password |
+| **一般ユーザー2** | <general2@gmail.com> / password |
+| **テストユーザー** | <test@example.com> / 12345678 |
+
+**注**: 全てのシードユーザーのパスワードは `password` です
 
 ---
 
@@ -162,6 +165,7 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ ログイン/ログアウト
 - ✅ メール認証
 - ✅ プロフィール編集
+- ✅ ユーザー評価表示（星評価）
 
 ### 商品機能
 
@@ -176,8 +180,48 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 
 - ✅ Stripe決済統合
 - ✅ クレジットカード決済
+- ✅ コンビニ払い
 - ✅ 購入履歴管理
 - ✅ 決済履歴保存
+- ✅ 住所未設定時の自動リダイレクト
+
+### チャット機能（模擬案件01）
+
+- ✅ 取引中商品一覧の表示
+- ✅ 購入者・出品者間のメッセージ送受信
+- ✅ テキスト＋画像メッセージ送信
+- ✅ 画像プレビュー機能（送信前確認）
+- ✅ メッセージ編集・削除（ソフトデリート）
+- ✅ 未読メッセージ管理
+- ✅ 未読バッジ表示（赤文字＋数字）
+- ✅ localStorage による下書き保存
+- ✅ サイドバーでの取引商品切り替え
+- ✅ レスポンシブデザイン（タブレット・PC対応）
+
+### 評価機能（模擬案件01）
+
+- ✅ 購入者の取引完了ボタン＋評価モーダル
+- ✅ 出品者の自動評価モーダル表示
+- ✅ 5段階星評価
+- ✅ 取引ステータス管理（in_transaction → buyer_completed → completed）
+- ✅ 取引完了メール通知（MailHog経由）
+- ✅ マイページでのユーザー評価平均表示
+
+---
+
+## MailHog（メール送信テスト）
+
+### アクセス方法
+
+開発環境では、メール送信のテストに **MailHog** を使用しています。
+
+- URL: [http://localhost:8025](http://localhost:8025)
+- 送信された全てのメールがMailHogで確認できます
+
+### 確認できるメール
+
+- ✅ メール認証メール
+- ✅ 取引完了通知メール（購入者評価後に出品者へ送信）
 
 ---
 
@@ -198,9 +242,23 @@ php artisan config:clear
 php artisan cache:clear
 ```
 
+### 画像が表示されない場合
+
+```bash
+docker-compose exec php php artisan storage:link
+```
+
 ### メール送信の確認
 
 MailHog（[http://localhost:8025](http://localhost:8025)）でメールを確認できます。
+
+### Nginxアップロードサイズエラー
+
+画像アップロード時に413エラーが出る場合、`docker/nginx/default.conf` で `client_max_body_size` が設定されているか確認してください。
+
+```bash
+docker-compose restart nginx
+```
 
 ---
 
@@ -219,6 +277,20 @@ php artisan route:clear
 
 ```bash
 php artisan migrate:fresh --seed
+```
+
+### テスト実行
+
+```bash
+# 全テスト実行
+php artisan test
+
+# 詳細表示
+php artisan test --testdox
+
+# 特定のテストのみ実行
+php artisan test --filter ChatControllerTest
+php artisan test --filter RatingControllerTest
 ```
 
 ---
@@ -245,28 +317,48 @@ php artisan migrate:fresh --seed
 
 ### テスト実行方法
 
-**すべてのテストを実行**: docker-compose exec php php artisan test  
-**テスト実行結果詳細表示**: docker-compose exec php php artisan test --verbose  
+**すべてのテストを実行**:
+
+```bash
+docker-compose exec php php artisan test
+```
+
+**テスト実行結果詳細表示**:
+
+```bash
+docker-compose exec php php artisan test --testdox
+```
+
+**特定のテストのみ実行**:
+
+```bash
+docker-compose exec php php artisan test --filter ChatControllerTest
+docker-compose exec php php artisan test --filter RatingControllerTest
+```
 
 ### 最新テスト実行結果
 
-**実行日**: 2025年11月5日  
-**テスト数**: 56  
-**成功**: ✅ 56（全て合格）  
+**実行日**: 2025年2月2日  
+**テスト数**: 63  
+**成功**: ✅ 63（全て合格）  
 **失敗**: ❌ 0  
 **成功率**: 100%  
-**実行時間**: 1.92秒  
+**実行時間**: 1.88秒  
+
 **テスト内訳**:
+
 - Unit Tests: 1
-- Feature Tests: 55
-  - 認証機能: 14テスト
+- Feature Tests: 62
+  - 認証機能: 15テスト
   - 商品機能: 36テスト
   - 住所機能: 4テスト
   - ユーザー機能: 6テスト
   - 支払い機能: 2テスト
+  - **チャット機能: 4テスト** ← 新規追加
+  - **評価機能: 3テスト** ← 新規追加
   - その他: 2テスト
-  
-````
+
+```
    PASS  Tests\Unit\ExampleTest
   ✓ example
 
@@ -298,6 +390,12 @@ php artisan migrate:fresh --seed
   ✓ register validation password must be string
   ✓ register validation password confirmation mismatch
   ✓ register success with valid data
+
+   PASS  Tests\Feature\ChatControllerTest
+  ✓ チャット画面が正常に表示される
+  ✓ メッセージを送信できる
+  ✓ 自分のメッセージを編集できる
+  ✓ 自分のメッセージを削除できる
 
    PASS  Tests\Feature\ExampleTest
   ✓ example
@@ -349,6 +447,11 @@ php artisan migrate:fresh --seed
   ✓ payment method selection page loads
   ✓ payment form displays
 
+   PASS  Tests\Feature\RatingControllerTest
+  ✓ 購入者が評価を投稿できる
+  ✓ 出品者が評価を投稿できる
+  ✓ ユーザーの平均評価が正しく計算される
+
    PASS  Tests\Feature\User\UserProfileTest
   ✓ mypage displays
   ✓ user profile displays all information
@@ -358,4 +461,124 @@ php artisan migrate:fresh --seed
   ✓ profile edit page displays
   ✓ profile shows current user information
   ✓ user can update profile
+
+  Tests:  63 passed
+  Time:   1.88s
+```
+
+### テストカバレッジ
+
+#### チャット機能テスト
+
+- ✅ チャット画面の表示権限チェック
+- ✅ メッセージ送信機能
+- ✅ メッセージ編集機能（権限チェック含む）
+- ✅ メッセージ削除機能（ソフトデリート）
+
+#### 評価機能テスト
+
+- ✅ 購入者評価投稿とメール送信
+- ✅ 出品者評価投稿と取引ステータス更新
+- ✅ ユーザー平均評価の計算ロジック
+
+---
+
+## 追加実装機能（模擬案件01）
+
+### 実装ファイル一覧
+
+#### マイグレーション
+
+- `2025_10_08_123000_create_chat_messages_table.php`
+- `2025_10_08_123100_create_ratings_table.php`
+- `2025_10_08_122800_add_transaction_status_to_items_table.php`
+
+#### モデル
+
+- `app/Models/ChatMessage.php`
+- `app/Models/Rating.php`
+
+#### コントローラー
+
+- `app/Http/Controllers/ChatController.php`
+- `app/Http/Controllers/RatingController.php`
+
+#### リクエスト
+
+- `app/Http/Requests/ChatMessageRequest.php`
+- `app/Http/Requests/RatingRequest.php`
+
+#### メール
+
+- `app/Mail/TransactionCompleteMail.php`
+
+#### ビュー
+
+- `resources/views/chat/show.blade.php`
+- `resources/views/chat/edit.blade.php`
+- `resources/views/mypage/_transaction_items.blade.php`
+- `resources/views/mail/transaction_complete.blade.php`
+
+#### テスト
+
+- `tests/Feature/ChatControllerTest.php`
+- `tests/Feature/RatingControllerTest.php`
+
+---
+
+## 実装した仕様（模擬案件01）
+
+### チャット機能仕様
+
+| 機能ID | 機能名 | 説明 |
+|--------|--------|------|
+| FN001 | 取引中商品一覧 | マイページに「取引中の商品」タブを追加 |
+| FN002 | チャット画面遷移 | 商品カードクリックでチャット画面へ遷移 |
+| FN003 | サイドバー切り替え | 左サイドバーで他の取引商品に切り替え可能 |
+| FN004 | メッセージソート | 新規メッセージ順にソート |
+| FN005 | 未読数表示 | 未読メッセージ数を赤バッジで表示 |
+| FN006 | メッセージ送信 | テキスト＋画像メッセージ送信 |
+| FN007 | 既読管理 | チャット画面表示時に自動既読 |
+| FN008 | メッセージ一覧 | 名前バー＋グレーメッセージ枠で表示 |
+| FN009 | 下書き保存 | localStorageで入力中テキスト保持 |
+| FN010 | メッセージ編集 | 自分のメッセージのみ編集可能 |
+| FN011 | メッセージ削除 | 自分のメッセージのみ削除可能（ソフトデリート） |
+
+### 評価機能仕様
+
+| 機能ID | 機能名 | 説明 |
+|--------|--------|------|
+| FN012 | 購入者評価 | 「取引を完了する」ボタンで評価モーダル表示 |
+| FN013 | 出品者評価 | 購入者完了後、チャット画面で自動モーダル表示 |
+| FN014 | 評価後遷移 | 評価送信後は商品一覧画面へリダイレクト |
+| FN015 | ステータス管理 | in_transaction → buyer_completed → completed |
+| FN016 | メール通知 | 購入者評価後、出品者へメール送信（MailHog） |
+
+---
+
+## 技術的な工夫
+
+### セキュリティ
+
+- ✅ CSRFトークンによる保護
+- ✅ アクセス権限チェック（購入者・出品者のみアクセス可能）
+- ✅ バリデーションによる入力チェック
+- ✅ 重複評価の防止
+
+### パフォーマンス
+
+- ✅ EagerロードによるN+1問題の回避
+- ✅ インデックスによるクエリ最適化
+- ✅ ソフトデリートによるデータ保持
+
+### UX/UI
+
+- ✅ レスポンシブデザイン（タブレット768-850px、PC1400-1540px対応）
+- ✅ 画像プレビュー機能
+- ✅ ホバーエフェクト
+- ✅ リアルタイム既読管理
+- ✅ localStorage による下書き保存
+
+---
+
 # ProTest_moriya
