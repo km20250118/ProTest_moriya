@@ -57,8 +57,21 @@ class PurchaseController extends Controller
         return back()->with('error', '決済の準備に失敗しました: ' . $e->getMessage());
       }
     } else {
+      // ─── コンビニ払いの処理 ───
+      // 購入履歴を保存
+      SoldItem::create([
+        'item_id' => $item->id,
+        'user_id' => $user->id,
+        'sending_postcode' => $user->postal_code,
+        'sending_address' => $user->address,
+        'sending_building' => $user->building,
+      ]);
+
+      // チャット機能: 取引ステータスを設定
+      $item->update(['transaction_status' => 'in_transaction']);
+
       return redirect()->route('purchase.index', ['item_id' => $item_id])
-        ->with('success', '購入処理を完了しました（仮）');
+        ->with('success', '購入処理を完了しました');
     }
   }
 
@@ -110,6 +123,9 @@ class PurchaseController extends Controller
           'sending_address' => $user->address,
           'sending_building' => $user->building,
         ]);
+
+        // ─── チャット機能: 取引ステータスを設定 ───
+        $item->update(['transaction_status' => 'in_transaction']);
 
         return view('purchase.success', compact('item', 'paymentIntent'));
       } catch (\Exception $e) {

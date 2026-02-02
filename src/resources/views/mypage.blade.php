@@ -15,16 +15,28 @@
 @include('components.header')
 <div class="container">
     <div class="user">
-            <div class="user__info">
-                <div class="user__img">
-                    @if (isset($user->profile->img_url))
-                        <img class="user__icon" src="{{ \Storage::url($user->profile->img_url) }}" alt="">
-                    @else
-                        <img id="myImage" class="user__icon" src="{{ asset('img/icon.png') }}" alt="">
-                    @endif
-                </div>
-                <p class="user__name">{{$user->name}}</p>
+           <div class="user__info">
+    <div class="user__img">
+        @if (isset($user->profile->img_url))
+            <img class="user__icon" src="{{ \Storage::url($user->profile->img_url) }}" alt="">
+        @else
+            <img id="myImage" class="user__icon" src="{{ asset('img/icon.png') }}" alt="">
+        @endif
+    </div>
+    <div class="user__text">
+        <p class="user__name">{{$user->name}}</p>
+        @php
+            $ratingAvg = $user->getRatingAverage();
+        @endphp
+        @if ($ratingAvg)
+            <div class="user-rating">
+                @for ($i = 1; $i <= 5; $i++)
+                    <span class="star {{ $i <= $ratingAvg ? 'filled' : '' }}">★</span>
+                @endfor
             </div>
+        @endif
+    </div>
+</div>
             <div class="mypage__user--btn">
             <a class="btn2" href="/mypage/profile">プロフィールを編集</a>
             </div>
@@ -33,35 +45,55 @@
         <ul class="border__list">
             <li>
                 <a href="/mypage?page=sell" 
-                   class="{{ request('page', 'sell') === 'sell' ? 'active' : '' }}">
+                   class="{{ $currentTab === 'sell' ? 'active' : '' }}">
                     出品した商品
                 </a>
             </li>
             <li>
                 <a href="/mypage?page=buy" 
-                   class="{{ request('page') === 'buy' ? 'active' : '' }}">
+                   class="{{ $currentTab === 'buy' ? 'active' : '' }}">
                     購入した商品
+                </a>
+            </li>
+            <li>
+                <a href="/mypage?page=transaction" 
+                   class="{{ $currentTab === 'transaction' ? 'active' : '' }}"
+                   style="position: relative;">
+                    取引中の商品
+                    @if ($transactionItems->sum('unread_count') > 0)
+                        <span class="badge bg-danger rounded-pill ms-1" 
+                              style="font-size: 11px; padding: 2px 7px;">
+                            {{ $transactionItems->sum('unread_count') }}
+                        </span>
+                    @endif
                 </a>
             </li>
         </ul>
     </div>
-    <div class="items">
-        @foreach ($items as $item)
-        <div class="item">
-            <a href="/item/{{$item->id}}">
-                @if ($item->sold())
-                    <div class="item__img--container sold">
-                        <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
-                    </div>
-                @else
-                    <div class="item__img--container">
-                        <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
-                    </div>
-                @endif
-                <p class="item__name">{{$item->name}}</p>
-            </a>
+
+    @if ($currentTab === 'transaction')
+        {{-- 取引中商品タブ（グリッド表示） --}}
+        @include('mypage._transaction_items', ['transactionItems' => $transactionItems])
+    @else
+        {{-- 既存の商品一覧 --}}
+        <div class="items">
+            @foreach ($items as $item)
+            <div class="item">
+                <a href="/item/{{$item->id}}">
+                    @if ($item->sold())
+                        <div class="item__img--container sold">
+                            <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
+                        </div>
+                    @else
+                        <div class="item__img--container">
+                            <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
+                        </div>
+                    @endif
+                    <p class="item__name">{{$item->name}}</p>
+                </a>
+            </div>
+            @endforeach
         </div>
-        @endforeach
-    </div>
+    @endif
 </div>
 @endsection

@@ -64,4 +64,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany('App\Models\Item');
     }
+
+    /**
+     * このユーザーが受け取った評価の平均値（整数、四捨五入）
+     * 評価がない場合は null を返す
+     */
+    public function getRatingAverage(): ?int
+    {
+        $avg = \App\Models\Rating::where('to_user_id', $this->id)->avg('rating');
+        return $avg !== null ? (int) round($avg) : null;
+    }
 }

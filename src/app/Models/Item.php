@@ -18,6 +18,7 @@ class Item extends Model
     'img_url',
     'user_id',
     'condition_id',
+    'transaction_status',
   ];
 
   public function user()
@@ -44,6 +45,23 @@ class Item extends Model
   {
     return $this->hasMany('App\Models\CategoryItem');
   }
+
+  // ─── チャット・評価機能用リレーション ───
+  public function chatMessages()
+  {
+    return $this->hasMany(\App\Models\ChatMessage::class);
+  }
+
+  public function ratings()
+  {
+    return $this->hasMany(\App\Models\Rating::class);
+  }
+
+  public function soldItem()
+  {
+    return $this->hasOne(SoldItem::class);
+  }
+  // ────────────────────────────────────────
 
   public function categories()
   {
@@ -84,4 +102,3 @@ class Item extends Model
     return $query->where('name', 'like', '%' . $item_name . '%');
   }
 }
-  

@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\SoldItem;
 use App\Http\Requests\ProfileRequest;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ChatController;
 
 class UserController extends Controller
 {
@@ -57,15 +58,25 @@ class UserController extends Controller
   public function mypage(Request $request)
   {
     $user = User::find(Auth::id());
+    $currentTab = $request->page ?? 'sell';
 
-    if ($request->page == 'buy') {
+    // ─── 取引中商品データの取得（全タブで使用） ───
+    $chatController = new ChatController();
+    $transactionItems = $chatController->getTransactionItems($user);
+
+    // ─── 各タブのデータ取得 ───
+    if ($currentTab == 'buy') {
       $items = SoldItem::where('user_id', $user->id)->get()->map(function ($sold_item) {
         return $sold_item->item;
       });
+    } elseif ($currentTab == 'transaction') {
+      // 取引中商品タブ
+      $items = $transactionItems;
     } else {
+      // 出品した商品タブ（デフォルト）
       $items = Item::where('user_id', $user->id)->get();
     }
 
-    return view('mypage', compact('user', 'items'));
+    return view('mypage', compact('user', 'items', 'currentTab', 'transactionItems'));
   }
 }

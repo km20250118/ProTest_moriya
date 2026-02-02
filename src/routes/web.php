@@ -7,6 +7,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\RatingController;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +36,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/mypage/profile', [UserController::class, 'updateProfile']);
     Route::get('/address/edit', [AddressController::class, 'edit'])->name('address.edit');
     Route::post('/address/update', [AddressController::class, 'update'])->name('address.update');
+
+    // ─── チャット機能 ───
+    Route::get('/chat/{item}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{item}', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/chat/{item}/message/{message}/edit', [ChatController::class, 'edit'])->name('chat.edit');
+    Route::put('/chat/{item}/message/{message}', [ChatController::class, 'update'])->name('chat.update');
+    Route::delete('/chat/{item}/message/{message}', [ChatController::class, 'destroy'])->name('chat.destroy');
+
+    // ─── 評価機能 ───
+    Route::post('/rating/{item}/buyer', [RatingController::class, 'storeBuyer'])->name('rating.buyer');
+    Route::post('/rating/{item}/seller', [RatingController::class, 'storeSeller'])->name('rating.seller');
 });
 
 Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('email');
