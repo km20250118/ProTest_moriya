@@ -309,7 +309,7 @@ php artisan test --filter RatingControllerTest
 
 ## ER図
 
- ![](2025-10-28-18-12-32.png)
+ ![](2025-02-02-er-diagram.png)
 
 ---
 
