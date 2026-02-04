@@ -1,8 +1,8 @@
 # ProTest_moriya
 
-## Pro入会テスト
+## タイトル : Pro入会テスト
 
-**タイトル** : 模擬案件フリマアプリの追加機能実装
+**作成物** : 模擬案件フリマアプリの追加機能実装
 
 ---
 
@@ -121,7 +121,7 @@ php artisan db:seed
 |---------|-----|
 | **Stripe Dashboard** | [https://dashboard.stripe.com/acct_1SN3miFbW3HpXmAy/test/dashboard](https://dashboard.stripe.com/acct_1SN3miFbW3HpXmAy/test/dashboard) |
 
-### 連絡先
+### 連絡先　（森谷 清隆）
 
 | 項目 | 内容 |
 |------|------|
@@ -347,11 +347,11 @@ php artisan test --filter RatingControllerTest
 
 ## 開発目的
 
-このプロジェクトは学習目的で開発しました。
+このプロジェクトはPro入会テスト目的で開発しました。
 
 ---
 
-## 開発者
+## 開発者　（森谷 清隆）
 
 [km20250118](https://github.com/km20250118)
 
@@ -650,4 +650,4 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 ---
 
-# 作成日；2026.02.04　（森谷 清隆）
+# 作成日：2026.02.04
