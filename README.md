@@ -298,7 +298,7 @@ MailHog（[http://localhost:8025](http://localhost:8025)）でメールを確認
 
 ### Nginxアップロードサイズエラー
 
-画像アップロード時に413エラーが出る場合、`docker/nginx/default.conf` で `client_max_body_size` が設定されているか確認してください。
+画像アップロード時に413エラーが出る場合、`docker/nginx/default.conf` で `client_max_body_size` を確認してください。注）テストは1MB以下のファイルで実施してください。
 
 ```bash
 docker-compose restart nginx
@@ -610,6 +610,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 | 本文が未入力 | 「本文を入力してください」 |
 | 本文が401文字以上 | 「本文は400文字以内で入力してください」 |
 | 画像がjpeg/jpg/png以外 | 「「.png」または「.jpeg」形式でアップロードしてください」 |
+　注）テストは1MB以下のファイルで実施してください。
 
 ### ダミーデータ作成仕様
 
