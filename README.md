@@ -123,8 +123,10 @@ php artisan db:seed
 
 ### 連絡先　（森谷 清隆）
 
+| 項目 | 内容 |
 |------|------|
 | **メールアドレス** | [kiyotaka.moriya@gmail.com](mailto:kiyotaka.moriya@gmail.com) |
+
 ---
 
 ## Stripe設定
@@ -647,4 +649,4 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 ---
 
-# 作成日：2026.02.04
+## 作成日：2026.02.04
