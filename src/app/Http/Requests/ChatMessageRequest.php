@@ -24,7 +24,7 @@ class ChatMessageRequest extends FormRequest
         return [
             'body.required' => '本文を入力してください',
             'body.string'   => '本文を入力してください',
-            'body.max'      => '本文は400文字以内に入力してください',
+            'body.max'      => '本文は400文字以内で入力してください',
             'image.mimes'   => '「.png」または「.jpeg」形式でアップロードしてください',
             'image.file'    => '「.png」または「.jpeg」形式でアップロードしてください',
         ];

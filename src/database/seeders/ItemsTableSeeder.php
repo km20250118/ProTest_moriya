@@ -17,13 +17,14 @@ class ItemsTableSeeder extends Seeder
     public function run()
     {
         $params = [
+            // C001〜C005: user_id: 1（一般ユーザ1）
             [
                 'name' => '腕時計',
                 'price' => 15000,
                 'brand' => 'Rolax',
                 'description' => 'スタイリッシュなデザインのメンズ腕時計',
-                'img_url' => 'public/img/mens_clock.jpg',
-                'user_id' => 2,
+                'img_url' => 'img/items/mens_clock.jpg',
+                'user_id' => 1,
                 'condition_id' => Condition::$UNUSED,
             ],
             [
@@ -31,8 +32,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 5000,
                 'brand' => '西芝',
                 'description' => '高速で信頼性の高いハードディスク',
-                'img_url' => 'public/img/hard_disk.jpg',
-                'user_id' => 2,
+                'img_url' => 'img/items/hard_disk.jpg',
+                'user_id' => 1,
                 'condition_id' => Condition::$HARMLESS,
             ],
             [
@@ -40,8 +41,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 300,
                 'brand' => '',
                 'description' => '新鮮な玉ねぎ3束のセット',
-                'img_url' => 'public/img/onion.jpg',
-                'user_id' => 2,
+                'img_url' => 'img/items/onion.jpg',
+                'user_id' => 1,
                 'condition_id' => Condition::$HARMED,
             ],
             [
@@ -49,8 +50,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 4000,
                 'brand' => '',
                 'description' => 'クラシックなデザインの革靴',
-                'img_url' => 'public/img/leather_shoes.jpg',
-                'user_id' => 2,
+                'img_url' => 'img/items/leather_shoes.jpg',
+                'user_id' => 1,
                 'condition_id' => Condition::$BAD_CONDITION,
             ],
             [
@@ -58,16 +59,17 @@ class ItemsTableSeeder extends Seeder
                 'price' => 45000,
                 'brand' => '',
                 'description' => '高性能なノートパソコン',
-                'img_url' => 'public/img/laptop_PC.jpg',
-                'user_id' => 2,
+                'img_url' => 'img/items/laptop_PC.jpg',
+                'user_id' => 1,
                 'condition_id' => Condition::$UNUSED,
             ],
+            // C006〜C010: user_id: 2（一般ユーザ2）
             [
                 'name' => 'マイク',
                 'price' => 8000,
                 'brand' => '',
                 'description' => '高音質のレコーディング用マイク',
-                'img_url' => 'public/img/mic.jpg',
+                'img_url' => 'img/items/mic.jpg',
                 'user_id' => 2,
                 'condition_id' => Condition::$HARMLESS,
             ],
@@ -76,8 +78,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 3500,
                 'brand' => '',
                 'description' => 'おしゃれなショルダーバッグ',
-                'img_url' => 'public/img/shoulder_bag.jpg',
-                'user_id' => 1,
+                'img_url' => 'img/items/shoulder_bag.jpg',
+                'user_id' => 2,
                 'condition_id' => Condition::$HARMED,
             ],
             [
@@ -85,8 +87,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 500,
                 'brand' => '',
                 'description' => '使いやすいタンブラー',
-                'img_url' => 'public/img/tumbler.jpg',
-                'user_id' => 1,
+                'img_url' => 'img/items/tumbler.jpg',
+                'user_id' => 2,
                 'condition_id' => Condition::$BAD_CONDITION,
             ],
             [
@@ -94,8 +96,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 4000,
                 'brand' => 'Starbacks',
                 'description' => '手動のコーヒーミル',
-                'img_url' => 'public/img/coffer_mill.jpg',
-                'user_id' => 1,
+                'img_url' => 'img/items/coffer_mill.jpg',
+                'user_id' => 2,
                 'condition_id' => Condition::$UNUSED,
             ],
             [
@@ -103,8 +105,8 @@ class ItemsTableSeeder extends Seeder
                 'price' => 2500,
                 'brand' => '',
                 'description' => '便利なメイクアップセット',
-                'img_url' => 'public/img/make_set.jpg',
-                'user_id' => 1,
+                'img_url' => 'img/items/makeup-set.jpg',
+                'user_id' => 2,
                 'condition_id' => Condition::$HARMLESS,
             ],
         ];
@@ -114,13 +116,14 @@ class ItemsTableSeeder extends Seeder
             Item::create($params[$i]);
         }
 
+        // いいね機能のダミーデータ
         Like::create([
             'user_id' => 1,
-            'item_id' => 1,
+            'item_id' => 6,
         ]);
         Like::create([
             'user_id' => 2,
-            'item_id' => 7,
+            'item_id' => 1,
         ]);
     }
 }

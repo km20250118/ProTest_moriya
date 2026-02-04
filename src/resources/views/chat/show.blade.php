@@ -654,7 +654,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
                    id="chatBody"
                    class="chat-text-input"
                    placeholder="取引メッセージを記入してください"
-                   maxlength="400"
                    value="{{ old('body') }}"
                    autocomplete="off">
             <label class="btn-add-image" for="chatImage">画像を追加</label>

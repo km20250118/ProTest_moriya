@@ -14,6 +14,7 @@
 - [URL一覧](#url一覧)
 - [Stripe設定](#stripe設定)
 - [主な機能](#主な機能)
+- [商品データ一覧](#商品データ一覧)
 - [トラブルシューティング](#トラブルシューティング)
 - [開発メモ](#開発メモ)
 - [ライセンス](#ライセンス)
@@ -60,14 +61,18 @@ cp .env.example .env
 # 5. アプリケーションキーの生成
 php artisan key:generate
 
-# 6. マイグレーションの実行
+# 6. シンボリックリンクの作成
+php artisan storage:link
+
+# 7. 商品画像をstorageにコピー
+mkdir -p storage/app/public/img/items
+cp -r public/img/items/* storage/app/public/img/items/
+
+# 8. マイグレーションの実行
 php artisan migrate
 
-# 7. シーディングの実行
+# 9. シーディングの実行
 php artisan db:seed
-
-# 8. シンボリックリンクの作成
-php artisan storage:link
 ```
 
 ---
@@ -80,6 +85,7 @@ php artisan storage:link
 |------|------|
 | **一般ユーザー1** | <general1@gmail.com> / password |
 | **一般ユーザー2** | <general2@gmail.com> / password |
+| **一般ユーザー3** | <general3@gmail.com> / password |
 | **テストユーザー** | <test@example.com> / 12345678 |
 
 **注**: 全てのシードユーザーのパスワードは `password` です
@@ -165,7 +171,7 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ ログイン/ログアウト
 - ✅ メール認証
 - ✅ プロフィール編集
-- ✅ ユーザー評価表示（星評価）
+- ✅ ユーザー評価表示（星評価・四捨五入）
 
 ### 商品機能
 
@@ -197,6 +203,8 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ localStorage による下書き保存
 - ✅ サイドバーでの取引商品切り替え
 - ✅ レスポンシブデザイン（タブレット・PC対応）
+- ✅ **バリデーション機能（本文必須・最大400文字、画像形式チェック）**
+- ✅ **日本語エラーメッセージ表示**
 
 ### 評価機能（Pro入会テスト追加機能）
 
@@ -205,7 +213,32 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ 5段階星評価
 - ✅ 取引ステータス管理（in_transaction → buyer_completed → completed）
 - ✅ 取引完了メール通知（MailHog経由）
-- ✅ マイページでのユーザー評価平均表示
+- ✅ マイページでのユーザー評価平均表示（四捨五入）
+
+---
+
+## 商品データ一覧
+
+シーディングで作成される10個の商品データ：
+
+| ID | 商品名 | 価格 | ブランド名 | 商品説明 | コンディション | 出品者 |
+|----|--------|------|-----------|----------|--------------|--------|
+| 1 | 腕時計 | ¥15,000 | Rolax | スタイリッシュなデザインのメンズ腕時計 | 良好 | 一般ユーザ1 |
+| 2 | HDD | ¥5,000 | 西芝 | 高速で信頼性の高いハードディスク | 目立った傷や汚れなし | 一般ユーザ1 |
+| 3 | 玉ねぎ3束 | ¥300 | なし | 新鮮な玉ねぎ3束のセット | やや傷や汚れあり | 一般ユーザ1 |
+| 4 | 革靴 | ¥4,000 | - | クラシックなデザインの革靴 | 状態が悪い | 一般ユーザ1 |
+| 5 | ノートPC | ¥45,000 | - | 高性能なノートパソコン | 良好 | 一般ユーザ1 |
+| 6 | マイク | ¥8,000 | なし | 高音質のレコーディング用マイク | 目立った傷や汚れなし | 一般ユーザ2 |
+| 7 | ショルダーバッグ | ¥3,500 | - | おしゃれなショルダーバッグ | やや傷や汚れあり | 一般ユーザ2 |
+| 8 | タンブラー | ¥500 | なし | 使いやすいタンブラー | 状態が悪い | 一般ユーザ2 |
+| 9 | コーヒーミル | ¥4,000 | Starbacks | 手動のコーヒーミル | 良好 | 一般ユーザ2 |
+| 10 | メイクセット | ¥2,500 | - | 便利なメイクアップセット | 目立った傷や汚れなし | 一般ユーザ2 |
+
+### ユーザーと商品の紐付け
+
+- **一般ユーザ1**（ID: 1）: 商品1〜5（C001〜C005）を出品
+- **一般ユーザ2**（ID: 2）: 商品6〜10（C006〜C010）を出品
+- **一般ユーザ3**（ID: 3）: 商品を出品していない
 
 ---
 
@@ -244,8 +277,22 @@ php artisan cache:clear
 
 ### 画像が表示されない場合
 
+シンボリックリンクと画像ファイルを確認してください：
+
 ```bash
-docker-compose exec php php artisan storage:link
+docker-compose exec php bash
+
+# シンボリックリンクを再作成
+php artisan storage:link
+
+# 商品画像をstorageにコピー（初回のみ）
+mkdir -p storage/app/public/img/items
+cp -r public/img/items/* storage/app/public/img/items/
+
+# キャッシュクリア
+php artisan optimize:clear
+
+exit
 ```
 
 ### メール送信の確認
@@ -271,6 +318,9 @@ php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
 php artisan route:clear
+
+# または一括で実行
+php artisan optimize:clear
 ```
 
 ### マイグレーションのリセット
@@ -295,9 +345,9 @@ php artisan test --filter RatingControllerTest
 
 ---
 
-## ライセンス
+## 開発目的
 
-このプロジェクトは学習目的で作成されました。
+このプロジェクトは学習目的で開発しました。
 
 ---
 
@@ -309,7 +359,7 @@ php artisan test --filter RatingControllerTest
 
 ## ER図
 
- ![](2025-02-02-er-diagram.png)
+![ER図](2025-02-02-er-diagram.png)
 
 ---
 
@@ -338,12 +388,12 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 ### 最新テスト実行結果
 
-**実行日**: 2025年2月2日  
+**実行日**: 2025年2月4日  
 **テスト数**: 63  
 **成功**: ✅ 63（全て合格）  
 **失敗**: ❌ 0  
 **成功率**: 100%  
-**実行時間**: 1.88秒  
+**実行時間**: 3.27秒  
 
 **テスト内訳**:
 
@@ -354,8 +404,8 @@ docker-compose exec php php artisan test --filter RatingControllerTest
   - 住所機能: 4テスト
   - ユーザー機能: 6テスト
   - 支払い機能: 2テスト
-  - **チャット機能: 4テスト** ← 新規追加
-  - **評価機能: 3テスト** ← 新規追加
+  - **チャット機能: 4テスト** ← Pro入会テスト追加
+  - **評価機能: 3テスト** ← Pro入会テスト追加
   - その他: 2テスト
 
 ```
@@ -463,7 +513,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
   ✓ user can update profile
 
   Tests:  63 passed
-  Time:   1.88s
+  Time:   3.27s
 ```
 
 ### テストカバレッジ
@@ -479,11 +529,11 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 - ✅ 購入者評価投稿とメール送信
 - ✅ 出品者評価投稿と取引ステータス更新
-- ✅ ユーザー平均評価の計算ロジック
+- ✅ ユーザー平均評価の計算ロジック（四捨五入）
 
 ---
 
-## 追加実装機能（（Pro入会テスト追加機能））
+## 追加実装機能（Pro入会テスト）
 
 ### 実装ファイル一覧
 
@@ -497,6 +547,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 - `app/Models/ChatMessage.php`
 - `app/Models/Rating.php`
+- `app/Models/User.php`（receivedRatings、givenRatings リレーション、getRatingAverage メソッド追加）
 
 #### コントローラー
 
@@ -505,7 +556,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 #### リクエスト
 
-- `app/Http/Requests/ChatMessageRequest.php`
+- `app/Http/Requests/ChatMessageRequest.php`（バリデーションルール・日本語エラーメッセージ）
 - `app/Http/Requests/RatingRequest.php`
 
 #### メール
@@ -524,35 +575,52 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 - `tests/Feature/ChatControllerTest.php`
 - `tests/Feature/RatingControllerTest.php`
 
+#### Seeder
+
+- `database/seeders/UsersTableSeeder.php`（3人のユーザー作成）
+- `database/seeders/ItemsTableSeeder.php`（10個の商品データ、user_id修正）
+
 ---
 
-## 実装した仕様（（Pro入会テスト追加機能））
+## 実装した仕様（Pro入会テスト）
 
 ### チャット機能仕様
 
 | 機能ID | 機能名 | 説明 |
 |--------|--------|------|
-| FN001 | 取引中商品一覧 | マイページに「取引中の商品」タブを追加 |
-| FN002 | チャット画面遷移 | 商品カードクリックでチャット画面へ遷移 |
-| FN003 | サイドバー切り替え | 左サイドバーで他の取引商品に切り替え可能 |
-| FN004 | メッセージソート | 新規メッセージ順にソート |
-| FN005 | 未読数表示 | 未読メッセージ数を赤バッジで表示 |
-| FN006 | メッセージ送信 | テキスト＋画像メッセージ送信 |
-| FN007 | 既読管理 | チャット画面表示時に自動既読 |
-| FN008 | メッセージ一覧 | 名前バー＋グレーメッセージ枠で表示 |
-| FN009 | 下書き保存 | localStorageで入力中テキスト保持 |
-| FN010 | メッセージ編集 | 自分のメッセージのみ編集可能 |
-| FN011 | メッセージ削除 | 自分のメッセージのみ削除可能（ソフトデリート） |
+| FN001 | 取引中商品確認機能 | マイページに「取引中の商品」タブを追加 |
+| FN002 | 取引チャット遷移機能 | 商品カードクリックでチャット画面へ遷移 |
+| FN003 | 別取引遷移機能 | 左サイドバーで他の取引商品に切り替え可能 |
+| FN004 | 取引自動ソート機能 | 新規メッセージ順にソート |
+| FN005 | 取引商品新規通知確認機能 | 未読メッセージ数を赤バッジで表示 |
+| FN006 | 取引チャット機能 | テキスト＋画像メッセージ送信 |
+| FN007 | バリデーション | 本文：入力必須・最大400文字、画像：jpeg/jpg/png形式 |
+| FN008 | エラーメッセージ表示 | 適切な日本語エラーメッセージを表示 |
+| FN009 | 入力情報保持機能 | チャット画面の入力情報を保持 |
+| FN010 | メッセージ編集機能 | 投稿済みのメッセージを編集 |
+| FN011 | メッセージ削除機能 | 投稿済みのメッセージを削除 |
+| FN012 | 取引後評価機能（購入者） | 取引完了モーダルからユーザーの評価 |
+| FN013 | 取引後評価機能（出品者） | 取引完了モーダルからユーザーの評価 |
+| FN014 | 取引後画面遷移 | 評価を送信した後、商品一覧画面に遷移 |
+| FN015 | メール送信 | 使用技術：mailhog |
+| FN016 | メール送信機能 | 購入者が取引完了後、出品者宛に自動で通知メールを送信 |
 
-### 評価機能仕様
+#### バリデーションエラーメッセージ詳細（FN008）
 
-| 機能ID | 機能名 | 説明 |
-|--------|--------|------|
-| FN012 | 購入者評価 | 「取引を完了する」ボタンで評価モーダル表示 |
-| FN013 | 出品者評価 | 購入者完了後、チャット画面で自動モーダル表示 |
-| FN014 | 評価後遷移 | 評価送信後は商品一覧画面へリダイレクト |
-| FN015 | ステータス管理 | in_transaction → buyer_completed → completed |
-| FN016 | メール通知 | 購入者評価後、出品者へメール送信（MailHog） |
+| 条件 | エラーメッセージ |
+|------|------------------|
+| 本文が未入力 | 「本文を入力してください」 |
+| 本文が401文字以上 | 「本文は400文字以内で入力してください」 |
+| 画像がjpeg/jpg/png以外 | 「「.png」または「.jpeg」形式でアップロードしてください」 |
+
+### ダミーデータ作成仕様
+
+| 項目 | 説明 |
+|------|------|
+| ユーザーデータ | 3人のユーザー作成（一般ユーザ1、2、3） |
+| 商品データ | 10個の商品作成（C001〜C010） |
+| ユーザーと商品の紐付け | 一般ユーザ1: C001〜C005<br>一般ユーザ2: C006〜C010<br>一般ユーザ3: 商品なし |
+| 画像配置 | `storage/app/public/img/items/` にコピー |
 
 ---
 
@@ -562,7 +630,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 - ✅ CSRFトークンによる保護
 - ✅ アクセス権限チェック（購入者・出品者のみアクセス可能）
-- ✅ バリデーションによる入力チェック
+- ✅ バリデーションによる入力チェック（サーバー側＋フロントエンド）
 - ✅ 重複評価の防止
 
 ### パフォーマンス
@@ -578,7 +646,8 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 - ✅ ホバーエフェクト
 - ✅ リアルタイム既読管理
 - ✅ localStorage による下書き保存
+- ✅ 日本語エラーメッセージ表示
 
 ---
 
-# ProTest_moriya
+# 作成日；2026.02.04　（森谷 清隆）
