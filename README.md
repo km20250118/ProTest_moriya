@@ -123,11 +123,8 @@ php artisan db:seed
 
 ### 連絡先　（森谷 清隆）
 
-| 項目 | 内容 |
 |------|------|
 | **メールアドレス** | [kiyotaka.moriya@gmail.com](mailto:kiyotaka.moriya@gmail.com) |
-| **パスワード** | coachtechtest |
-
 ---
 
 ## Stripe設定
