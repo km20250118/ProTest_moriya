@@ -88,8 +88,6 @@ php artisan db:seed
 | **一般ユーザー3** | <general3@gmail.com> / password |
 | **テストユーザー** | <test@example.com> / 12345678 |
 
-**注**: 全てのシードユーザーのパスワードは `password` です
-
 ---
 
 ## 使用技術
