@@ -3,826 +3,982 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ($isBuyer ? $seller : $buyer)->name }}さんとの取引</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>取引画面 - coachtech フリマ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+        }
+
+        /* ========== ヘッダー ========== */
+        .simple-header {
+            background-color: #000;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .simple-header__logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .simple-header__logo-image {
+            height: 28px;
+            width: auto;
+        }
+
+        /* ========== メインコンテナ ========== */
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 52px);
+            background: #fff9e6;
+        }
+
+        /* ========== サイドバー ========== */
+        .sidebar {
+            width: 200px;
+            background: #6b6b6b;
+            color: #fff;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .sidebar__header {
+            padding: 20px 16px;
+            background: #6b6b6b;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid #7b7b7b;
+        }
+
+        .sidebar__list {
+            list-style: none;
+            padding: 12px 10px;
+        }
+
+        .sidebar__item {
+            margin-bottom: 16px;
+        }
+
+        .sidebar__link {
+            display: block;
+            padding: 12px 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            background: #e8e8e8;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sidebar__link:hover {
+            background: #d8d8d8;
+        }
+
+        .sidebar__link.active {
+            background: #e8e8e8;
+            font-weight: 600;
+        }
+
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff385c;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* ========== メインコンテンツ ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff9e6;
+            overflow: hidden;
+        }
+
+        /* ========== チャットヘッダー ========== */
+        .chat-header {
+            padding: 16px 24px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .chat-header__user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header__avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 20px;
+        }
+
+        .chat-header__title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .complete-button {
+            background: #ff8fa3;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .complete-button:hover {
+            background: #ff7a91;
+        }
+
+        /* ========== 商品情報カード ========== */
+        .product-card {
+            display: flex;
+            gap: 20px;
+            padding: 20px 24px;
+            background: #fff;
+            border-bottom: 1px solid #999;
+            border-top: 1px solid #999;
+        }
+
+        .product-card__image {
+            width: 120px;
+            height: 120px;
+            border-radius: 4px;
+            background: #ffffff !important;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .product-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-card__info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .product-card__name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .product-card__price {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* ========== メッセージエリア ========== */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 60%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message__avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message__content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .message__sender {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .message.sent .message__sender {
+            text-align: right;
+        }
+
+        .message__bubble {
+            background: #e0e0e0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        .message.sent .message__bubble {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .message__text {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .message__image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .message__actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        .message.sent .message__actions {
+            justify-content: flex-end;
+        }
+
+        .message__action-btn {
+            color: #999;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .message__action-btn:hover {
+            color: #666;
+        }
+
+        /* ========== 入力エリア ========== */
+        .input-area {
+            padding: 16px 24px;
+            background: #fff;
+            border-top: 1px solid #999;
+            flex-shrink: 0;
+        }
+
+        .input-area__form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-area__textarea {
+            flex: 1;
+            height: 44px;
+            padding: 12px 16px;
+            border: 2px solid #333 !important;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-area__textarea::placeholder {
+            color: #666;
+        }
+
+        .input-area__textarea:focus {
+            outline: none;
+            border-color: #999 !important;
+        }
+
+        .input-area__image-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #fff;
+            border: 2px solid #e03131;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #e03131;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .input-area__image-label:hover {
+            background: #fff5f5;
+        }
+
+        .input-area__image-input {
+            display: none;
+        }
+
+        .input-area__submit {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-area__submit svg {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: #999;
+            stroke-width: 1.5;
+            transition: stroke 0.2s ease;
+        }
+
+        .input-area__submit:hover svg {
+            stroke: #666;
+        }
+
+        .input-area__preview {
+            margin-top: 12px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .input-area__preview-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .input-area__preview-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ff385c;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .error-message {
+            color: #ff385c;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* ========== モーダル ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal__content {
+            background: #fff9e6;
+            padding: 40px 32px;
+            border-radius: 12px;
+            border: 2px solid #333;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal__header {
+            text-align: left;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #999;
+        }
+
+        .modal__title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .modal__subtitle {
+            font-size: 17px;
+            color: #999;
+            margin-bottom: 24px;
+            padding-top: 24px;
+        }
+
+        .modal__form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal__field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal__label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #999;
+        }
+
+        .star-rating__input {
+            display: none;
+        }
+
+        .star-rating__label {
+            font-size: 80px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star-rating__label:hover,
+        .star-rating__label.active {
+            color: #ffd700;
+        }
+
+        .modal__textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .modal__textarea:focus {
+            outline: none;
+            border-color: #ff385c;
+        }
+
+        .modal__actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal__button {
+            padding: 12px 40px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal__button--secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal__button--secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .modal__button--primary {
+            background: #ff8fa3;
+            font-size: 17px;
+            color: #fff;
+        }
+
+        .modal__button--primary:hover {
+            background: #ff7a91;
+        }
+
+        /* ========== レスポンシブ対応 ========== */
+        @media (max-width: 850px) {
+            .chat-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #7b7b7b;
+            }
+
+            .sidebar__list {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .sidebar__item {
+                margin-bottom: 0;
+                min-width: 140px;
+            }
+
+            .message {
+                max-width: 75%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .simple-header {
+                padding: 10px 16px;
+            }
+
+            .simple-header__logo-image {
+                height: 24px;
+            }
+
+            .chat-header {
+                padding: 12px 16px;
+            }
+
+            .chat-header__avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .complete-button {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .product-card {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .product-card__image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .product-card__name {
+                font-size: 16px;
+            }
+
+            .product-card__price {
+                font-size: 14px;
+            }
+
+            .messages-area {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .input-area {
+                padding: 12px 16px;
+            }
+
+            .input-area__form {
+                flex-wrap: wrap;
+            }
+
+            .input-area__textarea {
+                width: 100%;
+            }
+
+            .modal__content {
+                padding: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-<!-- ═══ COACHTECHヘッダー ═══ -->
-<header style="background: #000; color: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000;">
-    <div style="display: flex; align-items: center; gap: 24px;">
-        <a href="/" style="display: flex; align-items: center;">
-    <img src="{{ asset('img/logo.png') }}" alt="COACHTECH" style="height: 28px;">
-　　　　　</a>
-        <form action="/item" method="GET" style="margin: 0;">
-            <input type="text" 
-                   name="keyword" 
-                   placeholder="なにをお探しですか？" 
-                   style="width: 400px; padding: 6px 12px; border: none; border-radius: 4px; font-size: 13px;"
-                   value="{{ request('keyword') }}">
-        </form>
-    </div>
-    <nav style="display: flex; gap: 20px; align-items: center;">
-    <form action="/logout" method="POST" style="margin: 0;">
-        @csrf
-        <button type="submit" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; padding: 0; font-family: inherit;">ログアウト</button>
-    </form>
-    <a href="/mypage" style="color: #fff; text-decoration: none; font-size: 14px;">マイページ</a>
-    <a href="/sell" style="background: #fff; color: #000; padding: 6px 16px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600;">出品</a>
-　　</nav>
-</header>
+    <!-- シンプルヘッダー -->
+    <header class="simple-header">
+        <a href="{{ url('/') }}" class="simple-header__logo">
+            <img src="{{ asset('img/logo.png') }}" alt="COACHTECH" class="simple-header__logo-image">
+        </a>
+    </header>
 
-<style>
-/* リセット */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    <!-- メインコンテナ -->
+    <div class="chat-container">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <div class="sidebar__header">その他の取引</div>
+            <ul class="sidebar__list">
+                @forelse($transactionItems as $transactionItem)
+                    <li class="sidebar__item">
+                        <a href="{{ route('chat.show', $transactionItem->id) }}" 
+                           class="sidebar__link {{ $transactionItem->id == $item->id ? 'active' : '' }}">
+                            {{ $transactionItem->name }}
+                            
+                            @php
+                                $unreadCount = $transactionItem->chatMessages()
+                                    ->where('user_id', '!=', auth()->id())
+                                    ->where($isBuyer ? 'read_by_buyer' : 'read_by_seller', false)
+                                    ->count();
+                            @endphp
+                            
+                            @if($unreadCount > 0)
+                                <span class="unread-badge">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+                @empty
+                    <li style="padding: 20px; text-align: center; color: #ccc; font-size: 12px;">
+                        取引中の商品はありません
+                    </li>
+                @endforelse
+            </ul>
+        </aside>
 
-/* ═══════════════════════════════════════════
-   レイアウト
-   ═══════════════════════════════════════════ */
-.chat-layout {
-    display: flex;
-    height: calc(100vh - 48px);
-}
-
-/* ═══════════════════════════════════════════
-   サイドバー（ダーク・テキストのみ）
-   ═══════════════════════════════════════════ */
-.chat-sidebar {
-    width: 180px;
-    min-width: 180px;
-    background: #3d3d3d;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.chat-sidebar-header {
-    padding: 14px 16px;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    flex-shrink: 0;
-}
-.chat-sidebar-list {
-    flex: 1;
-    overflow-y: auto;
-}
-.chat-sidebar-item {
-    display: block;
-    padding: 14px 16px;
-    color: #fff;
-    font-size: 13px;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background 0.15s;
-}
-.chat-sidebar-item:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-/* ═══════════════════════════════════════════
-   メインエリア
-   ═══════════════════════════════════════════ */
-.chat-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #fff;
-}
-
-/* ─── ヘッダー（アバター＋タイトル＋ボタン） ─── */
-.chat-main-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    flex-shrink: 0;
-    gap: 12px;
-}
-.chat-header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-    flex: 1;
-}
-.chat-header-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #c8c8c8;
-    flex-shrink: 0;
-}
-.chat-header-title {
-    font-size: 15px;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ─── 取引を完了するボタン（コーラルピル） ─── */
-.btn-complete {
-    background: #f87171;
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s;
-    flex-shrink: 0;
-    font-family: inherit;
-}
-.btn-complete:hover { background: #ef4444; }
-
-/* ─── 商品情報バー（画像＋名＋価格） ─── */
-.chat-item-card {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    gap: 18px;
-    border-bottom: 1px solid #e8e8e8;
-    background: #fff;
-    flex-shrink: 0;
-}
-.chat-item-card .item-img {
-    width: 78px;
-    height: 78px;
-    background: #d0d0d0;
-    flex-shrink: 0;
-    object-fit: cover;
-    display: block;
-}
-.chat-item-card .item-card-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: #222;
-}
-.chat-item-card .item-card-price {
-    font-size: 14px;
-    color: #555;
-    margin-top: 3px;
-}
-
-/* ═══════════════════════════════════════════
-   メッセージ一覧（名前バー＋メッセージ枠）
-   ═══════════════════════════════════════════ */
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-    background: #fff;
-}
-
-/* 1メッセージ = [名前行] + [メッセージ枠] + [アクション] */
-.chat-msg {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.chat-msg.self { align-items: flex-end; }
-
-/* 名前＋アバターの行 */
-.chat-msg-header {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-.chat-msg.self .chat-msg-header { flex-direction: row-reverse; }
-
-.chat-msg-avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #c8c8c8;
-    flex-shrink: 0;
-}
-.chat-msg-name {
-    font-size: 12px;
-    color: #666;
-}
-
-/* メッセージ枠（グレーバー） */
-.chat-msg-bar {
-    background: #e4e4e4;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: #333;
-    max-width: 72%;
-    word-break: break-word;
-    white-space: pre-wrap;
-    line-height: 1.5;
-    min-width: 40px;
-}
-.chat-msg.self .chat-msg-bar { background: #d8d8d8; }
-
-/* メッセージ内の画像添付 */
-.chat-msg-bar .msg-image {
-    max-width: 160px;
-    border-radius: 4px;
-    margin-top: 6px;
-    display: block;
-    cursor: zoom-in;
-    border: 1px solid rgba(0,0,0,0.08);
-}
-
-/* 編集・削除リンク */
-.chat-msg-actions {
-    display: flex;
-    gap: 8px;
-    font-size: 11px;
-}
-.chat-msg-actions a,
-.chat-msg-actions button {
-    color: #999;
-    text-decoration: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 11px;
-    padding: 0;
-    line-height: 1;
-}
-.chat-msg-actions a:hover,
-.chat-msg-actions button:hover { color: #555; }
-.chat-msg-actions .delete-form { display: inline; }
-
-/* ═══════════════════════════════════════════
-   入力エリア（シングルラインインプット＋画像を追加＋送信アイコン）
-   ═══════════════════════════════════════════ */
-.chat-input-area {
-    padding: 12px 16px;
-    border-top: 1px solid #e8e8e8;
-    background: #fff;
-    flex-shrink: 0;
-}
-.chat-input-area .error-msg {
-    color: #dc3545;
-    font-size: 12px;
-    margin-bottom: 6px;
-}
-.chat-input-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* テキスト入力 */
-.chat-text-input {
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 13px;
-    font-family: inherit;
-    outline: none;
-    min-width: 0;
-    box-sizing: border-box;
-    background: #fff;
-    color: #333;
-    height: 38px;
-}
-.chat-text-input::placeholder { color: #aaa; }
-.chat-text-input:focus { border-color: #aaa; }
-
-/* 画像を追加ボタン（赤アウトラインピル） */
-.btn-add-image {
-    background: transparent;
-    border: 1.5px solid #e74c3c;
-    color: #e74c3c;
-    padding: 5px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    font-family: inherit;
-    transition: background 0.15s;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-    height: 32px;
-    box-sizing: border-box;
-}
-.btn-add-image:hover { background: #fef2f2; }
-
-/* ファイル入力非表示 */
-.chat-input-row input[type="file"] { display: none; }
-
-/* 送信アイコン（紙飛行機SVG） */
-.btn-send-icon {
-    background: #fff;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    flex-shrink: 0;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-.btn-send-icon svg {
-    width: 22px;
-    height: 22px;
-    stroke: #666;
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: stroke 0.2s;
-}
-.btn-send-icon:hover {
-    background: #333;
-    border-color: #333;
-}
-.btn-send-icon:hover svg {
-    stroke: #fff;
-}
-
-/* ═══════════════════════════════════════════
-   画像プレビュー
-   ═══════════════════════════════════════════ */
-.image-preview {
-    padding: 8px 16px 0;
-}
-.preview-container {
-    position: relative;
-    display: inline-block;
-    max-width: 120px;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
-    background: #f5f5f5;
-}
-.preview-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-.preview-remove {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
-    background: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-.preview-remove:hover {
-    background: rgba(0, 0, 0, 0.9);
-}
-
-/* ═══════════════════════════════════════════
-   評価オーバーレイ（クリーム背景カード）
-   ═══════════════════════════════════════════ */
-.rating-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-}
-.rating-overlay.active { display: flex; }
-
-.rating-card {
-    background: #fefce8;
-    padding: 24px 28px 20px;
-    border-radius: 4px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-}
-.rating-card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 6px;
-}
-.rating-card-subtitle {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 18px;
-}
-.rating-card-stars {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 18px;
-}
-.rating-card-stars .star {
-    font-size: 38px;
-    color: #ccc;
-    cursor: pointer;
-    user-select: none;
-    transition: color 0.15s, transform 0.1s;
-    line-height: 1;
-}
-.rating-card-stars .star:hover { transform: scale(1.1); }
-.rating-card-stars .star.filled { color: #f39c12; }
-
-/* フッター区切り＋送信するボタン */
-.rating-card-footer {
-    border-top: 1px solid #e5e0c0;
-    padding-top: 14px;
-    text-align: right;
-}
-.btn-rating-submit {
-    background: #f87171;
-    color: #fff;
-    border: none;
-    padding: 7px 22px;
-    border-radius: 999px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.2s;
-}
-.btn-rating-submit:hover { background: #ef4444; }
-.btn-rating-submit:disabled { background: #ccc; cursor: not-allowed; }
-
-/* ═══════════════════════════════════════════
-   Lightbox
-   ═══════════════════════════════════════════ */
-.img-lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.82);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-.img-lightbox.active { display: flex; }
-.img-lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
-
-/* ═══════════════════════════════════════════
-   レスポンシブ
-   ═══════════════════════════════════════════ */
-.sidebar-toggle {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 34px; height: 34px;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-    background: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    color: #495057;
-    flex-shrink: 0;
-    transition: background 0.15s;
-}
-.sidebar-toggle:hover { background: #f0f4ff; }
-
-.sidebar-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1040;
-}
-.sidebar-backdrop.active { display: block; }
-
-/* タブレット 768‑850px */
-@media (max-width: 850px) {
-    .sidebar-toggle { display: flex; }
-
-    .chat-sidebar {
-        position: fixed;
-        top: 0; left: -180px;
-        height: 100%;
-        width: 180px; min-width: 180px;
-        z-index: 1050;
-        box-shadow: 2px 0 16px rgba(0,0,0,0.2);
-        transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
-    }
-    .chat-sidebar.open { left: 0; }
-
-    .chat-main-header { padding: 10px 14px; }
-    .chat-header-title { font-size: 14px; }
-    .btn-complete { padding: 6px 16px; font-size: 12px; }
-
-    .chat-item-card { padding: 12px 14px; gap: 12px; }
-    .chat-item-card .item-img { width: 60px; height: 60px; }
-    .chat-item-card .item-card-name { font-size: 15px; }
-
-    .chat-messages { padding: 16px 14px; }
-    .chat-msg-bar { max-width: 82%; }
-
-    .chat-input-area { padding: 10px 12px; }
-}
-
-/* PC ワイド 1400px+ */
-@media (min-width: 1400px) {
-    .chat-sidebar { width: 220px; min-width: 220px; }
-    .chat-messages { padding: 28px 28px; }
-}
-</style>
-
-<!-- サイドバーバックドロップ（タブレット用） -->
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
-
-<div class="chat-layout">
-
-    <!-- ─── サイドバー: その他の取引（テキストリスト） ─── -->
-    <div class="chat-sidebar" id="chatSidebar">
-        <div class="chat-sidebar-header">その他の取引</div>
-        <div class="chat-sidebar-list">
-            @foreach ($transactionItems as $transItem)
-                @if ($transItem->id !== $item->id)
-                <a href="{{ route('chat.show', $transItem) }}" class="chat-sidebar-item">
-                    {{ $transItem->name }}
-                </a>
-                @endif
-            @endforeach
-        </div>
-    </div>
-
-    <!-- ─── メインチャットエリア ─── -->
-    <div class="chat-main">
-
-        <!-- ヘッダー: アバター＋「〇〇」さんとの取引画面＋[取引を完了する] -->
-        <div class="chat-main-header">
-            <div class="chat-header-left">
-                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="その他の取引">☰</button>
-                <div class="chat-header-avatar"></div>
-                <div class="chat-header-title">「{{ ($isBuyer ? $seller : $buyer)->name }}」さんとの取引画面</div>
-            </div>
-            @if ($isBuyer && $item->transaction_status === 'in_transaction')
-                <button type="button" class="btn-complete" onclick="openRating('buyer')">取引を完了する</button>
-            @endif
-        </div>
-
-        <!-- 商品情報バー: 商品画像＋商品名＋価格 -->
-        <div class="chat-item-card">
-            <img src="{{ \Storage::url($item->img_url) }}"
-                 class="item-img"
-                 alt="{{ $item->name }}">
-            <div>
-                <div class="item-card-name">{{ $item->name }}</div>
-                <div class="item-card-price">¥{{ number_format($item->price) }}</div>
-            </div>
-        </div>
-
-        <!-- メッセージ一覧 -->
-        <div class="chat-messages" id="chatMessages">
-            @foreach ($messages as $message)
-            <div class="chat-msg {{ $message->user_id === Auth::id() ? 'self' : '' }}">
-                <!-- 名前＋アバター -->
-                <div class="chat-msg-header">
-                    <div class="chat-msg-avatar"></div>
-                    <div class="chat-msg-name">{{ $message->user->name }}</div>
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- チャットヘッダー -->
+            <div class="chat-header">
+                <div class="chat-header__user">
+                    <div class="chat-header__avatar">
+                        {{ mb_substr($isBuyer ? $seller->name : $buyer->name, 0, 1) }}
+                    </div>
+                    <h2 class="chat-header__title">「{{ $isBuyer ? $seller->name : $buyer->name }}」さんとの取引画面</h2>
                 </div>
-                <!-- メッセージバー -->
-                <div class="chat-msg-bar">
-                    {{ $message->body }}
-                    @if ($message->image)
-                        <img src="{{ asset('storage/' . $message->image) }}"
-                             class="msg-image"
-                             alt="添付画像"
-                             onclick="openLightbox(this.src)">
+                
+                @if($isBuyer && $item->transaction_status !== 'completed')
+                    <button type="button" class="complete-button" onclick="openBuyerRatingModal()">
+                        取引を完了する
+                    </button>
+                @endif
+            </div>
+
+            <!-- 商品情報カード -->
+            <div class="product-card">
+                <div class="product-card__image">
+                    @if($item->img_url)
+                        <img src="{{ asset('storage/' . $item->img_url) }}" 
+                             alt="{{ $item->name }}">
+                    @else
+                        商品画像
                     @endif
                 </div>
-                <!-- 編集・削除（自分のメッセージのみ） -->
-                @if ($message->user_id === Auth::id())
-                <div class="chat-msg-actions">
-                    <a href="{{ route('chat.edit', [$item, $message]) }}">編集</a>
-                    <form action="{{ route('chat.destroy', [$item, $message]) }}"
-                          method="POST"
-                          class="delete-form"
-                          onsubmit="return confirm('このメッセージを削除しますか？')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">削除</button>
-                    </form>
+                <div class="product-card__info">
+                    <div class="product-card__name">{{ $item->name }}</div>
+                    <div class="product-card__price">¥{{ number_format($item->price) }}</div>
                 </div>
-                @endif
             </div>
-            @endforeach
-        </div>
 
-        <!-- 入力エリア: テキスト入力＋[画像を追加]＋送信アイコン -->
-<div class="chat-input-area">
-    @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            <div class="error-msg">{{ $error }}</div>
-        @endforeach
+            <!-- メッセージエリア -->
+            <div class="messages-area" id="messagesArea">
+                @forelse($messages as $message)
+                    <div class="message {{ $message->user_id == auth()->id() ? 'sent' : 'received' }}">
+                        <div class="message__avatar">
+                            {{ mb_substr($message->user->name, 0, 1) }}
+                        </div>
+                        <div class="message__content">
+                            <div class="message__sender">{{ $message->user->name }}</div>
+                            <div class="message__bubble">
+                                @if($message->body)
+                                    <p class="message__text">{{ $message->body }}</p>
+                                @endif
+                                @if($message->image)
+                                    <img src="{{ asset('storage/' . $message->image) }}" 
+                                         alt="添付画像" 
+                                         class="message__image">
+                                @endif
+                            </div>
+                            @if($message->user_id == auth()->id())
+                                <div class="message__actions">
+                                    <a href="{{ route('chat.edit', [$item->id, $message->id]) }}" class="message__action-btn">編集</a>
+                                    <form action="{{ route('chat.destroy', [$item->id, $message->id]) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="message__action-btn" 
+                                                onclick="return confirm('このメッセージを削除しますか?')">削除</button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div style="text-align: center; color: #999; padding: 40px;">
+                        メッセージはまだありません
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- 入力エリア -->
+            <div class="input-area">
+                <form action="{{ route('chat.store', $item->id) }}" method="POST" enctype="multipart/form-data" class="input-area__form">
+                    @csrf
+                    <textarea 
+                        name="body" 
+                        class="input-area__textarea" 
+                        placeholder="取引メッセージを記入してください"
+                        id="messageBody">{{ old('body') }}</textarea>
+                    
+                    <label for="imageInput" class="input-area__image-label">
+                        画像を追加
+                    </label>
+                    <input 
+                        type="file" 
+                        name="image" 
+                        id="imageInput" 
+                        class="input-area__image-input"
+                        accept="image/*"
+                        onchange="previewImage(event)">
+                    
+                    <button type="submit" class="input-area__submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+                
+                @error('body')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+                @error('image')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+                
+                <div id="imagePreview" class="input-area__preview" style="display: none;">
+                    <img id="previewImg" class="input-area__preview-image" src="" alt="プレビュー">
+                    <span class="input-area__preview-remove" onclick="removeImage()">×</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 購入者評価モーダル -->
+    <div id="buyerRatingModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 class="modal__title">取引が完了しました。</h3>
+            </div>
+            <p class="modal__subtitle">今回の取引相手はどうでしたか？</p>
+            <form action="{{ route('rating.buyer', $item->id) }}" method="POST" class="modal__form">
+                @csrf
+                <div class="modal__field">
+                    <div class="star-rating">
+                        @for($i = 1; $i <= 5; $i++)
+                            <input type="radio" name="rating" value="{{ $i }}" id="buyer-star{{ $i }}" class="star-rating__input" required>
+                            <label for="buyer-star{{ $i }}" class="star-rating__label" onclick="setRating('buyer', {{ $i }})">★</label>
+                        @endfor
+                    </div>
+                </div>
+                <input type="hidden" name="comment" value="評価">
+                <div class="modal__actions">
+                    <button type="submit" class="modal__button modal__button--primary">
+                        送信する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if($showRatingModal ?? false)
+    <div id="sellerRatingModal" class="modal active">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 class="modal__title">取引が完了しました。</h3>
+            </div>
+            <p class="modal__subtitle">今回の取引相手はどうでしたか？</p>
+            <form action="{{ route('rating.seller', $item->id) }}" method="POST" class="modal__form">
+                @csrf
+                <div class="modal__field">
+                    <div class="star-rating">
+                        @for($i = 1; $i <= 5; $i++)
+                            <input type="radio" name="rating" value="{{ $i }}" id="seller-star{{ $i }}" class="star-rating__input" required>
+                            <label for="seller-star{{ $i }}" class="star-rating__label" onclick="setRating('seller', {{ $i }})">★</label>
+                        @endfor
+                    </div>
+                </div>
+                <input type="hidden" name="comment" value="評価">
+                <div class="modal__actions">
+                    <button type="submit" class="modal__button modal__button--primary">
+                        送信する
+                    </button>
+                </div>
+            </form>
+        </div>
     @endif
 
-    <!-- 画像プレビュー -->
-    <div id="imagePreview" class="image-preview" style="display: none;">
-        <div class="preview-container">
-            <img id="previewImg" src="" alt="プレビュー">
-            <button type="button" class="preview-remove" onclick="removeImage()">×</button>
-        </div>
-    </div>
-
-    <form action="{{ route('chat.store', $item) }}"
-          method="POST"
-          enctype="multipart/form-data"
-          id="chatForm">
-        @csrf
-        <div class="chat-input-row">
-            <input type="text"
-                   name="body"
-                   id="chatBody"
-                   class="chat-text-input"
-                   placeholder="取引メッセージを記入してください"
-                   value="{{ old('body') }}"
-                   autocomplete="off">
-            <label class="btn-add-image" for="chatImage">画像を追加</label>
-            <input type="file" name="image" id="chatImage" accept=".jpg,.jpeg,.png,.gif,.webp">
-            <!-- 紙飛行機アイコン＝送信 -->
-            <button type="submit" class="btn-send-icon" aria-label="送信">
-                <svg viewBox="0 0 24 24">
-                    <path d="M22 2L11 13"/>
-                    <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
-                </svg>
-            </button>
-        </div>
-    </form>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     購入者評価オーバーレイ（[取引を完了する]クリック時に開閉）
-     ═══════════════════════════════════════════ -->
-<div class="rating-overlay" id="buyerRatingOverlay">
-    <div class="rating-card">
-        <div class="rating-card-title">取引が完了しました。</div>
-        <div class="rating-card-subtitle">今回の取引相手はどうでしたか？</div>
-        <form action="{{ route('rating.buyer', $item) }}" method="POST">
-            @csrf
-            <div class="rating-card-stars" id="buyerStars">
-                @for ($i = 1; $i <= 5; $i++)
-                    <span class="star" data-value="{{ $i }}">★</span>
-                @endfor
-            </div>
-            <input type="hidden" name="rating" id="buyerRatingValue" value="">
-            <div class="rating-card-footer">
-                <button type="submit" class="btn-rating-submit" id="buyerSubmitBtn" disabled>送信する</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     出品者評価オーバーレイ（ページ開放時に自動表示）
-     ═══════════════════════════════════════════ -->
-@if ($showRatingModal)
-<div class="rating-overlay active" id="sellerRatingOverlay">
-    <div class="rating-card">
-        <div class="rating-card-title">取引が完了しました。</div>
-        <div class="rating-card-subtitle">今回の取引相手はどうでしたか？</div>
-        <form action="{{ route('rating.seller', $item) }}" method="POST">
-            @csrf
-            <div class="rating-card-stars" id="sellerStars">
-                @for ($i = 1; $i <= 5; $i++)
-                    <span class="star" data-value="{{ $i }}">★</span>
-                @endfor
-            </div>
-            <input type="hidden" name="rating" id="sellerRatingValue" value="">
-            <div class="rating-card-footer">
-                <button type="submit" class="btn-rating-submit" id="sellerSubmitBtn" disabled>送信する</button>
-            </div>
-        </form>
-    </div>
-</div>
-@endif
-
-<!-- ─── Lightbox ─── -->
-<div class="img-lightbox" id="lightbox" onclick="closeLightbox()">
-    <img id="lightboxImg" src="" alt="画像拡大">
-</div>
-
-<script>
-// ─── 評価オーバーレイ開閉 ───
-function openRating(type) {
-    document.getElementById(type + 'RatingOverlay').classList.add('active');
-}
-
-// ─── スター評価 ───
-function setupStarRating(containerId, hiddenId, submitBtnId) {
-    var container   = document.getElementById(containerId);
-    if (!container) return;
-    var stars       = container.querySelectorAll('.star');
-    var hiddenInput = document.getElementById(hiddenId);
-    var submitBtn   = document.getElementById(submitBtnId);
-    var selected    = 0;
-
-    function highlight(value) {
-        stars.forEach(function (s) {
-            s.classList.toggle('filled', parseInt(s.dataset.value) <= value);
-        });
-    }
-
-    stars.forEach(function (star) {
-        star.addEventListener('mouseover', function () { highlight(parseInt(this.dataset.value)); });
-        star.addEventListener('mouseout',  function () { highlight(selected); });
-        star.addEventListener('click',     function () {
-            selected            = parseInt(this.dataset.value);
-            hiddenInput.value   = selected;
-            highlight(selected);
-            if (submitBtn) submitBtn.disabled = false;
-        });
-    });
-}
-
-setupStarRating('buyerStars',  'buyerRatingValue',  'buyerSubmitBtn');
-setupStarRating('sellerStars', 'sellerRatingValue', 'sellerSubmitBtn');
-
-// ─── メッセージ末尾スクロール ───
-(function () {
-    var el = document.getElementById('chatMessages');
-    if (el) el.scrollTop = el.scrollHeight;
-})();
-
-// ─── FN009: 入力情報保持 ───
-(function () {
-    var DRAFT_KEY = 'chat_draft_{{ $item->id }}';
-    var chatBody  = document.getElementById('chatBody');
-
-    @if (session('message_sent'))
-        localStorage.removeItem(DRAFT_KEY);
-    @else
-        if (!chatBody.value) {
-            var draft = localStorage.getItem(DRAFT_KEY);
-            if (draft) chatBody.value = draft;
+ <script>
+        // メッセージエリアを最下部にスクロール
+        const messagesArea = document.getElementById('messagesArea');
+        if (messagesArea) {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
         }
-    @endif
 
-    chatBody.addEventListener('input', function () {
-        localStorage.setItem(DRAFT_KEY, this.value);
-    });
-})();
+        // 画像プレビュー
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'inline-block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
-// ─── Lightbox ───
-function openLightbox(src) {
-    document.getElementById('lightboxImg').src = src;
-    document.getElementById('lightbox').classList.add('active');
-}
-function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
-}
+        // 画像削除
+        function removeImage() {
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+        }
 
-// ─── レスポンシブ: サイドバートグル ───
-function toggleSidebar() {
-    var sidebar  = document.getElementById('chatSidebar');
-    var backdrop = document.getElementById('sidebarBackdrop');
-    if (sidebar.classList.contains('open')) {
-        closeSidebar();
-    } else {
-        sidebar.classList.add('open');
-        backdrop.classList.add('active');
-    }
-}
-function closeSidebar() {
-    document.getElementById('chatSidebar').classList.remove('open');
-    document.getElementById('sidebarBackdrop').classList.remove('active');
-}
+        // 購入者評価モーダル
+        function openBuyerRatingModal() {
+            document.getElementById('buyerRatingModal').classList.add('active');
+        }
 
-// ─── 画像プレビュー ───
-document.getElementById('chatImage').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('imagePreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-});
+        function closeBuyerRatingModal() {
+            document.getElementById('buyerRatingModal').classList.remove('active');
+        }
 
-function removeImage() {
-    document.getElementById('chatImage').value = '';
-    document.getElementById('imagePreview').style.display = 'none';
-}
-</script>
+        // 星評価
+
+        // 星評価
+        function setRating(type, rating) {
+            const prefix = type === 'buyer' ? 'buyer' : 'seller';
+            const modalId = type === 'buyer' ? 'buyerRatingModal' : 'sellerRatingModal';
+            
+            // 選択した星のラジオボタンをチェック
+            document.getElementById(`${prefix}-star${rating}`).checked = true;
+            
+            // すべての星のラベルを取得
+            const stars = document.querySelectorAll(`#${modalId} .star-rating__label`);
+            
+            // クリックした星までをアクティブに
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // LocalStorageでメッセージを保存
+        const textarea = document.getElementById('messageBody');
+        if (textarea) {
+            const storageKey = 'chat_message_{{ $item->id }}';
+            
+            const savedMessage = localStorage.getItem(storageKey);
+            if (savedMessage && !textarea.value) {
+                textarea.value = savedMessage;
+            }
+            
+            textarea.addEventListener('input', function() {
+                localStorage.setItem(storageKey, this.value);
+            });
+            
+            textarea.closest('form').addEventListener('submit', function() {
+                localStorage.removeItem(storageKey);
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,109 +1,349 @@
+/* ========== コンテナ ========== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ========== ユーザー情報セクション ========== */
 .user {
   display: flex;
-  justify-content: space-around;
   align-items: center;
+  justify-content: space-between;
+  padding: 50px 40px 10px;
+  background: #fff;
+  gap: 30px;
 }
 
 .user__info {
   display: flex;
   align-items: center;
-}
-
-.user__name {
-  font-size: 20px;
-  font-weight: bold;
+  gap: 24px;
+  flex: 1;
 }
 
 .user__img {
-  width: 150px;
-  height: 150px;
-  margin-right: 60px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user__icon {
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  background-color: #d9d9d9;
-}
-
-.items {
-  margin-top: 30px;
-}
-
-/* タブのリンクスタイル */
-.border__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.border__list li a {
-  text-decoration: none;
-  color: #333;
-  display: inline-block;
-  transition: all 0.3s;
-  padding: 0;
-}
-
-.border__list li a:hover {
-  color: #ff0000;
-}
-
-/* アクティブなタブ（背景色付き） */
-.border__list li a.active {
-  color: #fff !important;
-  background-color: #ff0000 !important;
-  border-radius: 5px !important;
-  padding: 10px 20px !important;
-  font-weight: bold !important;
+  object-fit: cover;
+  background: #d0d0d0;
 }
 
 .user__text {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  gap: 10px;
+}
+
+.user__name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .user-rating {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
 }
 
-.user-rating .star {
-  color: #ddd;
-  font-size: 18px;
+.star {
+  font-size: 27px;
+  color: #e0e0e0;
   line-height: 1;
 }
 
-.user-rating .star.filled {
-  color: #f39c12;
+.star.filled {
+  color: #ffc107;
 }
 
-/* 取引中の商品タブ */
-.border__list li a {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.mypage__user--btn {
+  flex-shrink: 0;
 }
 
-/* 未読がある場合：赤文字 */
-.border__list a.has-unread {
-  color: #e53935 !important;
+.mypage__user--btn .btn2 {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #fff;
+  color: #ff385c;
+  border: 2px solid #ff385c;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
   font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-/* 未読バッジ：赤い円形 */
+.mypage__user--btn .btn2:hover {
+  background: #ff385c;
+  color: #fff;
+}
+
+/* ========== タブメニュー ========== */
+.border {
+  background: #fff;
+  margin-bottom: 0;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.border__list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+}
+
+.border__list li {
+  margin: 0;
+}
+
+.border__list li a {
+  display: block;
+  padding: 18px 32px 16px;
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+  border-bottom: 3px solid transparent;
+}
+
+.border__list li a:hover {
+  color: #000;
+}
+
+.border__list li a.active {
+  color: #ff0000 !important;
+  background-color: transparent !important;
+  border-bottom: 3px solid transparent !important;
+  font-weight: 700 !important;
+}
+
+.border__list a.has-unread {
+  color: #000 !important;
+  font-weight: 700;
+}
+
+/* ========== 未読バッジ（タブ右側） ========== */
 .unread-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 8px;
-  background: #e53935;
+  background: #ff0000;
   color: #fff;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
-  border-radius: 50%;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  margin-left: 8px;
   line-height: 1;
+}
+
+/* ========== 商品一覧 ========== */
+.items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  padding: 32px 40px;
+  background: #fff;
+}
+
+.item {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+}
+
+
+
+.item__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== 商品カードの未読バッジ ========== */
+.item-unread-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ff0000;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  line-height: 1;
+}
+
+.item__name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #000;
+  line-height: 1.4;
+}
+
+.item__text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.btn2 {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #ff385c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn2:hover {
+  background: #e02d4c;
+}
+
+/* ========== レスポンシブ ========== */
+@media (max-width: 768px) {
+  .user {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 20px 30px;
+  }
+
+  .user__info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .user__icon {
+    width: 110px;
+    height: 110px;
+  }
+
+  .user__name {
+    font-size: 27px;
+  }
+
+  .star {
+    font-size: 24px;
+  }
+
+  .border__list {
+    overflow-x: auto;
+  }
+
+  .border__list li a {
+    padding: 14px 20px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .items {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .item__img--container {
+    overflow: hidden;
+    height: 160px;
+  }
+
+  .item__name {
+    font-size: 14px;
+  }
+
+  .item__text {
+    font-size: 13px;
+  }
+
+  .item-unread-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    top: 8px;
+    left: 8px;
+  }
+}
+
+
+
+
+
+
+
+/* ========== Sold表示（統一デザイン） ========== */
+
+
+/* ========== Sold表示（最終版） ========== */
+.item__img--container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden !important;
+  margin-bottom: 14px;
+}
+
+.item__img--container.sold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 70px 70px 0 0;
+  border-color: #c62828 transparent transparent transparent;
+  z-index: 9;
+}
+
+.item__img--container.sold::after {
+  content: 'Sold';
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 10;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  letter-spacing: 0.5px;
 }

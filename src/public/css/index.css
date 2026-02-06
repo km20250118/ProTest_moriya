@@ -5,36 +5,15 @@
   gap: 35px 10px;
 }
 
-.sold {
-  position: relative;
-}
 
-.sold::before {
-  content: "";
-  top: 0;
-  left: 0;
-  border-bottom: 4em solid transparent;
-  border-left: 4em solid #c12748;
-  position: absolute;
-  z-index: 100;
-}
 
-.sold::after {
-  content: "Sold";
-  display: block;
-  top: 1em;
-  transform: rotate(-45deg);
-  color: #fff;
-  left: 0.2em;
-  position: absolute;
-  z-index: 101;
-}
 
 .item__img--container {
   background-color: rgb(208, 208, 208);
   border-radius: 5px;
   width: 15em;
   height: 15em;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -98,5 +77,36 @@
   .item__img--container {
     width: 25vw;
     height: 10em;
+    overflow: hidden;
   }
+}
+/* ========== Sold表示（統一デザイン） ========== */
+.sold {
+  position: relative;
+}
+
+.sold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 80px 80px 0 0;
+  border-color: #c62828 transparent transparent transparent;
+  z-index: 100;
+}
+
+.sold::after {
+  content: 'Sold';
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 101;
+  transform: rotate(-45deg);
+  transform-origin: top left;
 }
