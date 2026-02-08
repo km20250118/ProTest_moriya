@@ -73,18 +73,20 @@
         }
 
         .sidebar__item {
-            margin-bottom: 16px;
+            margin-bottom: 32px;
         }
 
         .sidebar__link {
             display: block;
-            padding: 12px 8px;
+            width: 85%;
+            margin: 0 auto;
+            padding: 9px 6px;
             text-align: center;
             text-decoration: none;
             color: #333;
             background: #e8e8e8;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 15px;
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
@@ -103,8 +105,8 @@
 
         .unread-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: 5px;
+            right: 8px;
             background: #ff385c;
             color: #fff;
             font-size: 10px;
@@ -179,7 +181,7 @@
         .product-card {
             display: flex;
             gap: 20px;
-            padding: 20px 24px;
+            padding: 23px 24px;
             background: #fff;
             border-bottom: 1px solid #999;
             border-top: 1px solid #999;
@@ -350,7 +352,7 @@
             flex: 1;
             height: 44px;
             padding: 12px 16px;
-            border: 2px solid #333 !important;
+            border: 1px solid #999 !important;
             border-radius: 4px;
             font-size: 14px;
             font-family: inherit;
@@ -371,7 +373,8 @@
         .input-area__image-label {
             display: inline-flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 0 20px;
+            height: 44px;
             background: #fff;
             border: 2px solid #e03131;
             border-radius: 8px;
@@ -394,24 +397,29 @@
         .input-area__submit {
             background: none;
             border: none;
-            padding: 8px;
+            padding: 2px 4px;
             cursor: pointer;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
         }
 
         .input-area__submit svg {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             fill: none;
             stroke: #999;
             stroke-width: 1.5;
             transition: stroke 0.2s ease;
+            transform: rotate(5deg);
         }
 
+        .input-area__submit:hover {
+            background: #999;
+            border-radius: 4px;
+        }
         .input-area__submit:hover svg {
-            stroke: #666;
+            stroke: #fff;
         }
 
         .input-area__preview {
@@ -738,7 +746,15 @@
             <div class="chat-header">
                 <div class="chat-header__user">
                     <div class="chat-header__avatar">
-                        {{ mb_substr($isBuyer ? $seller->name : $buyer->name, 0, 1) }}
+                        @php
+                            $chatUser = $isBuyer ? $seller : $buyer;
+                            $userProfile = $chatUser->profile;
+                        @endphp
+                        @if($userProfile && $userProfile->img_url)
+                            <img src="{{ \Storage::url($userProfile->img_url) }}" alt="{{ $chatUser->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        @else
+                            {{ mb_substr($chatUser->name, 0, 1) }}
+                        @endif
                     </div>
                     <h2 class="chat-header__title">「{{ $isBuyer ? $seller->name : $buyer->name }}」さんとの取引画面</h2>
                 </div>
@@ -771,7 +787,14 @@
                 @forelse($messages as $message)
                     <div class="message {{ $message->user_id == auth()->id() ? 'sent' : 'received' }}">
                         <div class="message__avatar">
-                            {{ mb_substr($message->user->name, 0, 1) }}
+                            @php
+                                $messageUserProfile = $message->user->profile;
+                            @endphp
+                            @if($messageUserProfile && $messageUserProfile->img_url)
+                                <img src="{{ \Storage::url($messageUserProfile->img_url) }}" alt="{{ $message->user->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            @else
+                                {{ mb_substr($message->user->name, 0, 1) }}
+                            @endif
                         </div>
                         <div class="message__content">
                             <div class="message__sender">{{ $message->user->name }}</div>

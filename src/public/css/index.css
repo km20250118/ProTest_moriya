@@ -101,10 +101,10 @@
 .sold::after {
   content: 'Sold';
   position: absolute;
-  top: 15px;
-  left: 10px;
+  top: 18px;
+  left: 6px;
   color: #fff;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 700;
   z-index: 101;
   transform: rotate(-45deg);

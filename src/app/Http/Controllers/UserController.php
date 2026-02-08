@@ -22,38 +22,44 @@ class UserController extends Controller
 
   public function updateProfile(ProfileRequest $request)
   {
-    $img = $request->file('img_url');
-    if (isset($img)) {
-      $img_url = Storage::disk('local')->put('public/img', $img);
-    } else {
-      $img_url = '';
-    }
-
     $profile = Profile::where('user_id', Auth::id())->first();
-    if ($profile) {
-      $profile->update([
-        'user_id' => Auth::id(),
-        'img_url' => $img_url,
-        'postcode' => $request->postcode,
-        'address' => $request->address,
-        'building' => $request->building
-      ]);
-    } else {
-      Profile::create([
-        'user_id' => Auth::id(),
-        'img_url' => $img_url,
-        'postcode' => $request->postcode,
-        'address' => $request->address,
-        'building' => $request->building
-      ]);
+    
+    // 画像処理
+    $img_url = null;
+    if ($request->hasFile('img_url')) {
+      \Log::info("画像アップロード: " . $request->file("img_url")->getClientOriginalName());
+      $img_url = Storage::disk('local')->put('public/img', $request->file('img_url'));
     }
-
+    
+    $profileData = [
+      'user_id' => Auth::id(),
+      'postcode' => $request->postcode,
+      'address' => $request->address,
+      'building' => $request->building
+    ];
+    
+    // 画像がアップロードされた場合のみimg_urlを更新
+    if ($img_url) {
+      $profileData['img_url'] = $img_url;
+    }
+    
+    if ($profile) {
+      $profile->update($profileData);
+    } else {
+      // 新規作成の場合は画像がなくても空文字列を設定
+      if (!$img_url) {
+        $profileData['img_url'] = '';
+      }
+      Profile::create($profileData);
+    }
+    
     User::find(Auth::id())->update([
       'name' => $request->name
     ]);
-
+    
     return redirect('/');
   }
+
 
   public function mypage(Request $request)
   {

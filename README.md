@@ -27,19 +27,16 @@
 ## 環境構築手順
 
 ### 1. リポジトリのクローン
-
 ```bash
 git clone git@github.com:km20250118/ProTest_moriya.git
 ```
 
 Dockerデスクトップアプリを立ち上げる
-
 ```bash
 docker-compose up -d --build
 ```
 
 ### 2. Laravel環境構築
-
 ```bash
 # 1. PHPコンテナに入る
 docker-compose exec php bash
@@ -83,10 +80,10 @@ php artisan db:seed
 
 | 項目 | 内容 |
 |------|------|
-| **一般ユーザー1** | <general1@gmail.com> / password |
-| **一般ユーザー2** | <general2@gmail.com> / password |
-| **一般ユーザー3** | <general3@gmail.com> / password |
-| **テストユーザー** | <test@example.com> / 12345678 |
+| **一般ユーザー1** | general1@gmail.com / password |
+| **一般ユーザー2** | general2@gmail.com / password |
+| **一般ユーザー3** | general3@gmail.com / password |
+| **テストユーザー** | test@example.com / 12345678 |
 
 ---
 
@@ -132,7 +129,6 @@ php artisan db:seed
 ### APIキーの設定
 
 `.env`ファイルに以下を追加してください：
-
 ```env
 STRIPE_PUBLIC_KEY=pk_test_あなたの公開キー
 STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
@@ -168,6 +164,7 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ ログイン/ログアウト
 - ✅ メール認証
 - ✅ プロフィール編集
+- ✅ **プロフィール画像アップロード**
 - ✅ ユーザー評価表示（星評価・四捨五入）
 
 ### 商品機能
@@ -199,9 +196,10 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 - ✅ 未読バッジ表示（赤文字＋数字）
 - ✅ localStorage による下書き保存
 - ✅ サイドバーでの取引商品切り替え
+- ✅ **プロフィール画像表示（チャットヘッダー・メッセージアバター）**
 - ✅ レスポンシブデザイン（タブレット・PC対応）
-- ✅ **バリデーション機能（本文必須・最大400文字、画像形式チェック）**
-- ✅ **日本語エラーメッセージ表示**
+- ✅ バリデーション機能（本文必須・最大400文字、画像形式チェック）
+- ✅ 日本語エラーメッセージ表示
 
 ### 評価機能（Pro入会テスト追加機能）
 
@@ -258,14 +256,12 @@ STRIPE_SECRET_KEY=sk_test_あなたのシークレットキー
 ## トラブルシューティング
 
 ### データベース接続エラー
-
 ```bash
 docker-compose restart mysql
 docker-compose exec php php artisan config:clear
 ```
 
 ### Stripe決済エラー
-
 ```bash
 docker-compose exec php bash
 php artisan config:clear
@@ -275,7 +271,6 @@ php artisan cache:clear
 ### 画像が表示されない場合
 
 シンボリックリンクと画像ファイルを確認してください：
-
 ```bash
 docker-compose exec php bash
 
@@ -299,7 +294,6 @@ MailHog（[http://localhost:8025](http://localhost:8025)）でメールを確認
 ### Nginxアップロードサイズエラー
 
 画像アップロード時に413エラーが出る場合、`docker/nginx/default.conf` で `client_max_body_size` を確認してください。注）テストは1MB以下のファイルで実施してください。
-
 ```bash
 docker-compose restart nginx
 ```
@@ -309,7 +303,6 @@ docker-compose restart nginx
 ## 開発メモ
 
 ### キャッシュクリア
-
 ```bash
 php artisan config:clear
 php artisan cache:clear
@@ -321,13 +314,11 @@ php artisan optimize:clear
 ```
 
 ### マイグレーションのリセット
-
 ```bash
 php artisan migrate:fresh --seed
 ```
 
 ### テスト実行
-
 ```bash
 # 全テスト実行
 php artisan test
@@ -366,19 +357,16 @@ php artisan test --filter RatingControllerTest
 ### テスト実行方法
 
 **すべてのテストを実行**:
-
 ```bash
 docker-compose exec php php artisan test
 ```
 
 **テスト実行結果詳細表示**:
-
 ```bash
 docker-compose exec php php artisan test --testdox
 ```
 
 **特定のテストのみ実行**:
-
 ```bash
 docker-compose exec php php artisan test --filter ChatControllerTest
 docker-compose exec php php artisan test --filter RatingControllerTest
@@ -386,26 +374,26 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 ### 最新テスト実行結果
 
-**実行日**: 2025年2月4日  
+**実行日**: 2026年2月8日  
 **テスト数**: 63  
 **成功**: ✅ 63（全て合格）  
 **失敗**: ❌ 0  
 **成功率**: 100%  
-**実行時間**: 3.27秒  
+**実行時間**: 2.68秒  
 
 **テスト内訳**:
 
 - Unit Tests: 1
 - Feature Tests: 62
-  - 認証機能: 15テスト
-  - 商品機能: 36テスト
+  - 認証機能: 13テスト
+  - 商品機能: 23テスト
   - 住所機能: 4テスト
-  - ユーザー機能: 6テスト
+  - ユーザー機能: 7テスト
   - 支払い機能: 2テスト
+  - コメント機能: 4テスト
   - **チャット機能: 4テスト** ← Pro入会テスト追加
   - **評価機能: 3テスト** ← Pro入会テスト追加
   - その他: 2テスト
-
 ```
    PASS  Tests\Unit\ExampleTest
   ✓ example
@@ -511,7 +499,7 @@ docker-compose exec php php artisan test --filter RatingControllerTest
   ✓ user can update profile
 
   Tests:  63 passed
-  Time:   3.27s
+  Time:   2.68s
 ```
 
 ### テストカバレッジ
@@ -545,12 +533,13 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 - `app/Models/ChatMessage.php`
 - `app/Models/Rating.php`
-- `app/Models/User.php`（receivedRatings、givenRatings リレーション、getRatingAverage メソッド追加）
+- `app/Models/User.php`（receivedRatings、givenRatings リレーション、getRatingAverage メソッド、profileリレーション追加）
 
 #### コントローラー
 
 - `app/Http/Controllers/ChatController.php`
 - `app/Http/Controllers/RatingController.php`
+- `app/Http/Controllers/UserController.php`（updateProfile メソッド改善）
 
 #### リクエスト
 
@@ -563,10 +552,18 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 #### ビュー
 
-- `resources/views/chat/show.blade.php`
+- `resources/views/chat/show.blade.php`（プロフィール画像表示機能追加）
 - `resources/views/chat/edit.blade.php`
+- `resources/views/profile.blade.php`（プロフィール画像プレビュー機能追加）
+- `resources/views/mypage.blade.php`
 - `resources/views/mypage/_transaction_items.blade.php`
 - `resources/views/mail/transaction_complete.blade.php`
+
+#### CSS
+
+- `public/css/mypage.css`（タブ間隔調整、Soldバッジ最適化）
+- `public/css/index.css`（Soldバッジ最適化）
+- `public/css/detail.css`（Soldバッジ最適化）
 
 #### テスト
 
@@ -602,6 +599,15 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 | FN014 | 取引後画面遷移 | 評価を送信した後、商品一覧画面に遷移 |
 | FN015 | メール送信 | 使用技術：mailhog |
 | FN016 | メール送信機能 | 購入者が取引完了後、出品者宛に自動で通知メールを送信 |
+| FN017 | **プロフィール画像表示** | チャットヘッダー・メッセージアバターにプロフィール画像を表示 |
+
+### プロフィール機能追加仕様
+
+| 機能ID | 機能名 | 説明 |
+|--------|--------|------|
+| FN018 | プロフィール画像アップロード | ユーザーがプロフィール画像を登録・更新可能 |
+| FN019 | プロフィール画像プレビュー | 画像選択時にプレビューを表示 |
+| FN020 | プロフィール画像保持 | 画像を選択しない場合は既存の画像を保持 |
 
 #### バリデーションエラーメッセージ詳細（FN008）
 
@@ -616,10 +622,37 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 
 | 項目 | 説明 |
 |------|------|
-| ユーザーデータ | 3人のユーザー作成（一般ユーザ1、2、3） |
-| 商品データ | 10個の商品作成（C001〜C010） |
+| ユーザーデータ | 4人のユーザー作成（一般ユーザ1、2、3、test） |
+| 商品データ | 10個の商品作成（C001〜C010）- 全て未販売状態 |
 | ユーザーと商品の紐付け | 一般ユーザ1: C001〜C005<br>一般ユーザ2: C006〜C010<br>一般ユーザ3: 商品なし |
 | 画像配置 | `storage/app/public/img/items/` にコピー |
+| プロフィール画像 | `storage/app/public/img/` に保存 |
+
+---
+
+## UI/UX改善実装
+
+### チャット画面UI調整
+
+- ✅ Soldバッジの最適化（全画面で三角形内に文字を配置）
+- ✅ タブ間隔の調整（左右padding 4px）
+- ✅ サイドバーボタンのサイズ調整（幅85%、padding 9px 6px）
+- ✅ 商品カードの高さ調整（padding 23px）
+- ✅ 送信ボタンのホバー効果（ネガポジ反転）
+- ✅ 未読バッジの位置調整（ボタン内に配置）
+
+### マイページUI調整
+
+- ✅ Soldバッジの位置調整（mypage.css: 70px三角形、文字10px）
+- ✅ タブのレスポンシブ対応（768px以下で中央寄せ）
+
+### トップページUI調整
+
+- ✅ Soldバッジの位置調整（index.css: 80px三角形、文字11px）
+
+### 商品詳細ページUI調整
+
+- ✅ Soldバッジの位置調整（detail.css: 100px三角形、文字12px）
 
 ---
 
@@ -631,22 +664,26 @@ docker-compose exec php php artisan test --filter RatingControllerTest
 - ✅ アクセス権限チェック（購入者・出品者のみアクセス可能）
 - ✅ バリデーションによる入力チェック（サーバー側＋フロントエンド）
 - ✅ 重複評価の防止
+- ✅ プロフィール画像の安全な保存（Storage::disk）
 
 ### パフォーマンス
 
 - ✅ EagerロードによるN+1問題の回避
 - ✅ インデックスによるクエリ最適化
 - ✅ ソフトデリートによるデータ保持
+- ✅ プロフィール画像の効率的な読み込み（profileリレーション）
 
 ### UX/UI
 
 - ✅ レスポンシブデザイン（タブレット768-850px、PC1400-1540px対応）
-- ✅ 画像プレビュー機能
+- ✅ 画像プレビュー機能（チャット・プロフィール）
 - ✅ ホバーエフェクト
 - ✅ リアルタイム既読管理
 - ✅ localStorage による下書き保存
 - ✅ 日本語エラーメッセージ表示
+- ✅ プロフィール画像の円形表示（アバター）
+- ✅ Soldバッジの視認性向上（-45度回転、最適配置）
 
 ---
 
-## 作成日：2026.02.04
+## 作成日：2026.02.08

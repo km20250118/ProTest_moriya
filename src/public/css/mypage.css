@@ -109,7 +109,7 @@
 
 .border__list li a {
   display: block;
-  padding: 18px 32px 16px;
+  padding: 18px 4px 16px;
   text-decoration: none;
   color: #333;
   font-size: 15px;
@@ -265,6 +265,7 @@
 
   .border__list {
     overflow-x: auto;
+    justify-content: center;
   }
 
   .border__list li a {
@@ -337,10 +338,10 @@
 .item__img--container.sold::after {
   content: 'Sold';
   position: absolute;
-  top: 8px;
-  left: 4px;
+  top: 15px;
+  left: 5px;
   color: #fff;
-  font-size: 13px;
+  font-size: 9px;
   font-weight: 700;
   z-index: 10;
   transform: rotate(-45deg);
